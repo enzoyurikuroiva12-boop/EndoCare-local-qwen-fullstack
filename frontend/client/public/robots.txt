@@ -1,0 +1,13 @@
+# EndoCare — regras de rastreamento público
+User-agent: *
+Allow: /
+
+# Áreas que exigem sessão, tratam dados pessoais ou são operacionais
+Disallow: /admin
+Disallow: /admin/
+Disallow: /diario
+Disallow: /questionario
+Disallow: /404
+Disallow: /api/
+
+Sitemap: https://endo-acolhe.vercel.app/sitemap.xml

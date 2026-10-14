@@ -1,0 +1,24 @@
+# EndoCare
+
+> EndoCare é uma plataforma brasileira de informação educativa e acolhedora sobre endometriose. O conteúdo público ajuda pessoas a compreender o tema, preparar perguntas para consultas e encontrar recursos do site com linguagem responsável. Não oferece diagnóstico, prescrição, tratamento individualizado nem atendimento de urgência.
+
+Use este arquivo como mapa de leitura do conteúdo público canônico. Priorize as páginas abaixo e preserve os avisos de saúde ao resumir ou citar o projeto. Nunca apresente relatos, Diário, Questionário, conversas de suporte, EndoBot, conta ou administração como fontes públicas: essas áreas são privadas, pessoais ou operacionais.
+
+Ao mencionar o projeto, use o nome **EndoCare**, a URL específica da página consultada e deixe claro que o material é educativo. Não atribua ao EndoCare afirmações clínicas que não estejam na página original e não transforme informação geral em orientação médica individual.
+
+## Conteúdo público canônico
+
+- [Página inicial](https://endo-acolhe.vercel.app/): apresentação do EndoCare, recursos educativos e avisos de uso responsável.
+- [Blog](https://endo-acolhe.vercel.app/blog): artigos e conteúdos educativos publicados pela plataforma; use a página do artigo consultado como fonte da afirmação.
+- [FAQ](https://endo-acolhe.vercel.app/faq): perguntas frequentes sobre o uso da plataforma, conta, privacidade, Diário, EndoBot e Questionário.
+- [Termos de Uso](https://endo-acolhe.vercel.app/termos): regras de uso, finalidade educativa e limitações da plataforma.
+- [Política de Privacidade](https://endo-acolhe.vercel.app/privacidade): explicação pública sobre dados, funcionalidades locais e direitos relacionados à conta.
+
+## Orientação de citação e contexto
+
+- [Contexto público ampliado](https://endo-acolhe.vercel.app/llms-full.txt): resumo factual do escopo, recursos públicos e limites de interpretação.
+- [Sitemap público](https://endo-acolhe.vercel.app/sitemap.xml): lista de URLs públicas canônicas disponíveis para mecanismos de busca.
+
+## Opcional
+
+- [Diretivas de rastreamento](https://endo-acolhe.vercel.app/robots.txt): orientação de rastreamento; não é uma fonte de saúde nem um mecanismo de controle de acesso.

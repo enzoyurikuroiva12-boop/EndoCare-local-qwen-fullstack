@@ -1,0 +1,9 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "outputDirectory": "public",
+  "functions": {
+    "api/endobot.ts": { "maxDuration": 90 },
+    "api/endobot-voice.ts": { "maxDuration": 180 },
+    "api/endobot-tts.ts": { "maxDuration": 120 }
+  }
+}

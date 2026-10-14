@@ -1,0 +1,119 @@
+.admin-account-delete { color: #9b4047; border-color: #e6c7ca; background: #fff7f7; }.admin-reputation-reset { color: #8a651d; border-color: #ead59e; background: #fff9e8; }.admin-reputation-reset:hover { border-color: #c9a24d; background: #fff3cf; }.admin-account-expiry { color: #765b72; }.admin-control-form { display: grid; gap: 9px; margin-top: 12px; }.admin-control-form label { display: grid; gap: 6px; color: #604a5d; font-size: .82rem; font-weight: 700; }.admin-control-form input { min-height: 40px; border: 1px solid #d9cbd7; padding: 0 10px; color: #4b3748; background: #fff; }.admin-delete-account-copy, .admin-role-confirmation { display: grid; gap: 6px; margin-top: 8px; color: #705d6f; font-size: .86rem; line-height: 1.55; }.admin-delete-account-copy { gap: 10px; }.admin-delete-account-copy strong { color: #8d3d45; }.admin-reputation-reset-copy strong { color: #8a651d; }.admin-role-confirmation strong { color: #62445d; }.admin-role-confirmation span { overflow-wrap: anywhere; color: #856f82; font-size: .78rem; }.admin-delete-account-copy input { width: 100%; min-height: 40px; border: 1px solid #d8babe; padding: 0 10px; }.admin-account__actions .admin-account-delete, .admin-account__actions .admin-reputation-reset, .admin-account__actions .admin-role-grant, .admin-account__actions .admin-role-revoke { display: inline-flex; align-items: center; gap: 6px; }.admin-role-grant { color: #386a51; border-color: #bcd7c6; background: #f4fbf6; }.admin-role-revoke { color: #9b4047; border-color: #e6c7ca; background: #fff7f7; }.account-owner { color: #6a4b21; border-color: #e4cf99; background: #fff8e7; }.admin-owner-note { display: flex; align-items: flex-start; gap: 8px; margin: 13px 0; border: 1px solid #e4cf99; border-radius: 11px; padding: 11px 12px; color: #735c3a; background: #fff9eb; font-size: .8rem; line-height: 1.5; }.admin-owner-note svg { flex: 0 0 auto; color: #9c7939; }.admin-owner-note strong { color: #624817; }
+.admin-site-copyright { margin: 24px 0 4px; color: #846f82; text-align: center; font-size: .76rem; }
+.admin-account__actions { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }.admin-account__actions button { min-height: 32px; padding: 6px 8px; border-radius: 8px; font-size: .74rem; line-height: 1; }.admin-account__badges { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 5px; }.account-role-owner, .account-role-admin, .account-role-moderator, .account-role-support, .account-reputation-good, .account-reputation-attention, .account-reputation-very-poor { display: inline-flex; align-items: center; border: 1px solid; border-radius: 999px; padding: 4px 7px; font-size: .67rem; font-style: normal; font-weight: 800; line-height: 1.1; white-space: nowrap; }.account-role-owner { color: #6a4b21; border-color: #e4cf99; background: #fff8e7; }.account-role-admin { color: #5e3d70; border-color: #d6c0e2; background: #f6effa; }.account-role-moderator { color: #386a51; border-color: #bcd7c6; background: #f1faf3; }.account-role-support { color: #2f6571; border-color: #b7d8df; background: #eff9fa; }.account-reputation-good { color: #2f714d; border-color: #b9dec7; background: #f1fbf5; }.account-reputation-attention { color: #8a651d; border-color: #ead59e; background: #fff9e8; }.account-reputation-very-poor { color: #9b4047; border-color: #edc5c9; background: #fff4f4; }.admin-punishment-list { display: grid; gap: 8px; }.admin-punishment-list article { display: grid; gap: 5px; border: 1px solid #e6dae4; border-radius: 11px; padding: 11px 12px; background: linear-gradient(135deg, #fffefe, #faf5f9); }.admin-punishment-list article > div { display: flex; align-items: center; justify-content: space-between; gap: 12px; }.admin-punishment-list strong { color: #563e51; font-size: .84rem; }.admin-punishment-list span { color: #8a536e; font-size: .74rem; font-weight: 800; text-transform: capitalize; }.admin-punishment-list p { margin: 0; color: #765f72; font-size: .76rem; line-height: 1.45; }.admin-role-confirmation label { display: grid; gap: 6px; margin-top: 8px; color: #604a5d; font-weight: 800; }.admin-role-confirmation select { min-height: 40px; border: 1px solid #d9cbd7; border-radius: 8px; padding: 0 10px; color: #4b3748; background: #fff; font: inherit; }
+.admin-edit-content, .admin-edit-cancel { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 32px; border: 1px solid #c9b8dd; border-radius: 8px; padding: 6px 8px; color: #60467c; background: #faf7ff; font: inherit; font-size: .74rem; font-weight: 800; cursor: pointer; transition: background-color .16s ease-out, border-color .16s ease-out, transform .16s ease-out; }.admin-edit-content:hover, .admin-edit-cancel:hover { border-color: #a78ac4; background: #f1e9fa; }.admin-edit-content:active, .admin-edit-cancel:active { transform: scale(.97); }.admin-edit-content:disabled { cursor: wait; opacity: .62; }.admin-questionnaire-reset { color: #76572b; border-color: #e1cc97; background: #fffaf0; }.admin-questionnaire-reset:hover { border-color: #c5a761; background: #fff4d9; }.admin-questionnaire-reset-copy { display: grid; gap: 3px; margin-top: 10px; padding: 10px 12px; border: 1px solid #e5d6c0; border-radius: 10px; color: #765f43; background: #fffaf1; }.admin-questionnaire-reset-copy strong { color: #5d4630; font-size: .85rem; overflow-wrap: anywhere; }.admin-questionnaire-reset-copy span { color: #896f51; font-size: .74rem; overflow-wrap: anywhere; }.admin-pin-post { color: #76572b; border-color: #e1cc97; background: #fffaf0; }.admin-pin-post:hover { border-color: #c5a761; background: #fff4d9; }.admin-post-pinned { display: inline-flex; align-items: center; gap: 4px; border: 1px solid #e1cc97; border-radius: 999px; padding: 4px 7px; color: #76572b; background: #fffaf0; font-size: .67rem; font-style: normal; font-weight: 800; line-height: 1.1; }.admin-post-list__actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 6px; }
+.admin-endobot-security__list { display: grid; gap: 9px; }.admin-endobot-security__list article { display: grid; gap: 7px; border: 1px solid #e8d9e3; border-radius: 12px; padding: 12px; background: linear-gradient(135deg, #fffdfd, #faf6fa); }.admin-endobot-security__meta { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }.admin-endobot-security__meta > div { display: grid; gap: 3px; min-width: 0; }.admin-endobot-security__meta strong { overflow-wrap: anywhere; color: #553d51; font-size: .84rem; }.admin-endobot-security__meta span, .admin-endobot-security__list p, .admin-endobot-security__list time { color: #7a6475; font-size: .75rem; line-height: 1.45; }.admin-endobot-security__list p { margin: 0; font-weight: 800; }.admin-endobot-security__list time { display: block; }.admin-endobot-security__action { flex: 0 0 auto; border: 1px solid; border-radius: 999px; padding: 4px 7px; font-size: .67rem; font-style: normal; font-weight: 800; line-height: 1.1; }.admin-endobot-security__action.is-blocked { color: #805e22; border-color: #ead49c; background: #fff9e9; }.admin-endobot-security__action.is-ip_blocked { color: #76516c; border-color: #d9c0d5; background: #f8f0f7; }.admin-endobot-security__action.is-suspended { color: #93424a; border-color: #edc6ca; background: #fff4f4; }.admin-endobot-security__labels { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }.admin-endobot-security__labels > span { color: #765f72; font-size: .72rem; font-weight: 800; }.admin-endobot-security__severity { border: 1px solid; border-radius: 999px; padding: 4px 7px; font-size: .67rem; font-style: normal; font-weight: 800; line-height: 1.1; }.admin-endobot-security__severity.is-medium { color: #765d27; border-color: #ead59e; background: #fff9e8; }.admin-endobot-security__severity.is-high { color: #8a4c31; border-color: #e9c4a8; background: #fff4ea; }.admin-endobot-security__severity.is-critical { color: #93424a; border-color: #edc6ca; background: #fff4f4; }.admin-endobot-security__actions { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }.admin-endobot-security__actions > span { display: inline-flex; align-items: center; gap: 5px; color: #3b6d51; font-size: .74rem; font-weight: 800; }
+.admin-support-workspace { display: grid; grid-template-columns: minmax(190px, .72fr) minmax(0, 1.4fr); min-height: 310px; border: 1px solid #e4d7e1; border-radius: 14px; overflow: hidden; background: #fffdfd; }.admin-support-thread-list { display: grid; align-content: start; gap: 1px; overflow: auto; border-right: 1px solid #e7dce5; background: #fbf8fa; }.admin-support-thread-list button { display: grid; gap: 3px; width: 100%; border: 0; border-left: 3px solid transparent; padding: 13px; color: #574353; background: transparent; text-align: left; cursor: pointer; }.admin-support-thread-list button:hover, .admin-support-thread-list button.is-active { border-left-color: #9b6084; background: #f1e5ed; }.admin-support-thread-list strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: .82rem; }.admin-support-thread-list span { color: #846f80; font-size: .72rem; }.admin-support-chat { display: grid; grid-template-rows: minmax(0, 1fr) auto; min-height: 310px; }.admin-support-history { display: grid; align-content: start; gap: 10px; overflow: auto; padding: 14px; background: linear-gradient(135deg, rgba(247, 239, 245, .58), transparent); }.admin-support-history article { max-width: min(88%, 510px); padding: 9px 10px; border-radius: 11px; background: #eee5ec; }.admin-support-history article.is-admin { justify-self: end; color: #fff; background: #705068; }.admin-support-history article strong, .admin-support-history article time { display: block; font-size: .68rem; opacity: .82; }.admin-support-history article p { margin: 4px 0; line-height: 1.42; white-space: pre-wrap; }.admin-support-chat form { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; padding: 10px; border-top: 1px solid #e7dce5; background: #fff; }.admin-support-chat textarea { min-height: 44px; resize: vertical; border: 1px solid #dfceda; border-radius: 10px; padding: 9px; color: #4d374b; font: inherit; }.admin-support-chat form button { align-self: end; }
+.admin-punishment-panel:not(.admin-punishment-panel--standalone), .admin-rail a[href="#admin-punishments"] { display: none; }
+.admin-punishment-panel--standalone { width: min(880px, 100%); margin-inline: auto; }
+@media (max-width: 760px) { .admin-support-workspace { grid-template-columns: 1fr; }.admin-support-thread-list { max-height: 170px; border-right: 0; border-bottom: 1px solid #e7dce5; }.admin-support-chat { min-height: 300px; }.admin-support-chat form { grid-template-columns: 1fr; }.admin-support-chat form button { justify-self: end; }.admin-account__badges { justify-content: flex-start; }.admin-punishment-list article > div, .admin-endobot-security__meta { align-items: flex-start; flex-direction: column; gap: 4px; } }
+
+.admin-maintenance-panel { border-color: #e4cf94; background: linear-gradient(135deg, #fffdf4, #fff8e7); }
+.admin-maintenance-panel .admin-panel__heading { align-items: center; }
+.admin-maintenance-panel .admin-panel__heading > span { color: #654a25; }
+.admin-maintenance-panel .admin-panel__heading > span svg { color: #9b6b1c; }
+.admin-maintenance-status { display: inline-flex; align-items: center; border: 1px solid; border-radius: 999px; padding: 5px 8px; font-size: .69rem; font-style: normal; font-weight: 850; line-height: 1.1; }
+.admin-maintenance-status.is-on { color: #805e22; border-color: #ead49c; background: #fff2c9; }
+.admin-maintenance-status.is-off { color: #386a51; border-color: #bcd7c6; background: #f1faf3; }
+.admin-maintenance-toggle { display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 36px; border: 1px solid; border-radius: 9px; padding: 8px 12px; font: inherit; font-size: .78rem; font-weight: 850; cursor: pointer; transition: background-color .16s ease-out, border-color .16s ease-out, transform .16s ease-out; }
+.admin-maintenance-toggle:hover { transform: translateY(-1px); }
+.admin-maintenance-toggle:active { transform: translateY(0); }
+.admin-maintenance-toggle:disabled { cursor: wait; opacity: .62; transform: none; }
+.admin-maintenance-toggle.is-on { color: #805e22; border-color: #d9bb6b; background: #fff4d2; }
+.admin-maintenance-toggle.is-on:hover { border-color: #b9913e; background: #ffedb3; }
+.admin-maintenance-toggle.is-off { color: #386a51; border-color: #bcd7c6; background: #f4fbf6; }
+.admin-maintenance-toggle.is-off:hover { border-color: #85b598; background: #eaf7ee; }
+@media (max-width: 560px) { .admin-maintenance-panel .admin-panel__heading { align-items: flex-start; flex-direction: column; gap: 7px; } .admin-maintenance-toggle { width: 100%; } }
+
+
+/* Contenção dos módulos administrativos complementares em telas estreitas. */
+@media (max-width: 600px) {
+  .admin-account__badges,
+  .admin-account__actions,
+  .admin-post-list__actions,
+  .admin-endobot-security__actions {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .admin-account__actions,
+  .admin-post-list__actions {
+    justify-content: flex-start;
+    align-items: stretch;
+  }
+
+  .admin-post-list__actions {
+    display: flex !important;
+  }
+
+  .admin-story__actions {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .admin-account__actions button,
+  .admin-post-list__actions > *,
+  .admin-edit-content,
+  .admin-edit-cancel,
+  .admin-pin-post {
+    max-width: 100%;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    line-height: 1.25;
+  }
+
+  .admin-punishment-list article > div,
+  .admin-endobot-security__meta {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .admin-punishment-list article strong,
+  .admin-punishment-list article span,
+  .admin-punishment-list article p,
+  .admin-endobot-security__meta span,
+  .admin-endobot-security__action {
+    overflow-wrap: anywhere;
+  }
+
+  .admin-endobot-security__action {
+    white-space: normal;
+  }
+
+  .admin-support-workspace,
+  .admin-support-thread-list,
+  .admin-support-chat,
+  .admin-support-history {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  .admin-support-thread-list button strong {
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  .admin-support-history article {
+    max-width: 100%;
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .admin-support-chat form textarea {
+    width: 100%;
+    min-width: 0;
+  }
+}
+
+@media (max-width: 420px) {
+  .admin-account__actions button,
+  .admin-post-list__actions > *,
+  .admin-endobot-security__actions > * {
+    flex: 1 1 100%;
+  }
+
+  .admin-support-chat form button {
+    width: 100%;
+  }
+}

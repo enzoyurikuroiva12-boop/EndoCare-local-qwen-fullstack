@@ -1,0 +1,132 @@
+.endobot-supervision-panel {
+  scroll-margin-top: 1rem;
+}
+
+.endobot-supervision-live {
+  display: flex;
+  align-items: center;
+  gap: .42rem;
+  color: #176b71;
+  font-size: .82rem;
+  margin: .1rem 0 1rem;
+}
+
+.endobot-supervision-workspace {
+  display: grid;
+  grid-template-columns: minmax(14rem, .72fr) minmax(0, 1.6fr);
+  min-height: 34rem;
+  border: 1px solid rgba(67, 94, 92, .18);
+  border-radius: 1.1rem;
+  overflow: hidden;
+  background: rgba(255, 253, 248, .72);
+}
+
+.endobot-supervision-queue {
+  padding: .55rem;
+  background: rgba(225, 237, 232, .38);
+  border-right: 1px solid rgba(67, 94, 92, .14);
+  overflow: auto;
+  max-height: 41rem;
+}
+
+.endobot-supervision-queue button {
+  width: 100%;
+  display: grid;
+  gap: .32rem;
+  text-align: left;
+  color: var(--ink, #2f3136);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: .82rem;
+  padding: .78rem;
+  cursor: pointer;
+}
+
+.endobot-supervision-queue button:hover,
+.endobot-supervision-queue button:focus-visible,
+.endobot-supervision-queue button.is-selected {
+  background: #fffdf8;
+  border-color: rgba(27, 107, 113, .38);
+  outline: none;
+}
+
+.endobot-supervision-queue button > span,
+.endobot-supervision-conversation__heading > div > div {
+  display: flex;
+  justify-content: space-between;
+  gap: .5rem;
+  align-items: center;
+}
+
+.endobot-supervision-queue em {
+  width: fit-content;
+  font-style: normal;
+  color: #176b71;
+  background: #d9efed;
+  border-radius: 99px;
+  padding: .12rem .42rem;
+  font-size: .66rem;
+  font-weight: 750;
+  text-transform: uppercase;
+  letter-spacing: .035em;
+}
+
+.endobot-supervision-queue time,
+.endobot-supervision-queue small,
+.endobot-supervision-conversation__heading p,
+.endobot-supervision-messages time,
+.endobot-supervision-composer small {
+  color: var(--muted, #6d6b69);
+  font-size: .75rem;
+}
+
+.endobot-supervision-queue strong { font-size: .92rem; line-height: 1.25; }
+.endobot-supervision-queue b,
+.endobot-supervision-conversation__heading b { width: fit-content; font-size: .71rem; border-radius: 99px; padding: .22rem .48rem; }
+.endobot-supervision-queue b.is-paused,
+.endobot-supervision-conversation__heading b.is-paused { background: #fff0c8; color: #805600; }
+.endobot-supervision-queue b.is-automated,
+.endobot-supervision-conversation__heading b.is-automated { background: #e4efdf; color: #396038; }
+
+.endobot-supervision-conversation { min-width: 0; display: flex; flex-direction: column; }
+.endobot-supervision-conversation__heading { display: flex; justify-content: space-between; gap: 1rem; align-items: flex-start; padding: 1rem 1.1rem; border-bottom: 1px solid rgba(67, 94, 92, .14); }
+.endobot-supervision-conversation__heading > div:first-child > span { color: #176b71; font-size: .76rem; font-weight: 750; text-transform: uppercase; letter-spacing: .06em; }
+.endobot-supervision-conversation__heading h3 { margin: .18rem 0; font-size: 1.08rem; }
+.endobot-supervision-conversation__heading p { margin: 0; }
+.endobot-supervision-conversation__heading > div:last-child { display: grid; justify-items: end; gap: .55rem; }
+.endobot-supervision-pause, .endobot-supervision-resume { display: inline-flex; align-items: center; justify-content: center; gap: .35rem; border-radius: .62rem; padding: .5rem .66rem; font: inherit; font-weight: 720; font-size: .79rem; cursor: pointer; }
+.endobot-supervision-pause { background: #915f00; color: #fff; border: 1px solid #915f00; }
+.endobot-supervision-resume { background: #176b71; color: #fff; border: 1px solid #176b71; }
+.endobot-supervision-pause:hover, .endobot-supervision-pause:focus-visible, .endobot-supervision-resume:hover, .endobot-supervision-resume:focus-visible { filter: brightness(.93); outline: 3px solid rgba(27, 107, 113, .24); outline-offset: 2px; }
+
+.endobot-supervision-messages { flex: 1; min-height: 19rem; max-height: 27rem; overflow: auto; padding: 1rem 1.1rem; display: grid; align-content: start; gap: .7rem; }
+.endobot-supervision-messages article { max-width: min(88%, 38rem); padding: .68rem .78rem; border-radius: .75rem; background: #f1ede8; border-left: 3px solid #a49588; }
+.endobot-supervision-messages article.is-user { justify-self: end; background: #f8ebef; border-left-color: #a85c77; }
+.endobot-supervision-messages article.is-assistant { background: #edf2e8; border-left-color: #60806d; }
+.endobot-supervision-messages article.is-human { background: #e0f0ef; border-left-color: #176b71; }
+.endobot-supervision-messages strong { display: block; color: #176b71; font-size: .76rem; }
+.endobot-supervision-messages p { margin: .3rem 0 .42rem; line-height: 1.45; white-space: pre-wrap; overflow-wrap: anywhere; }
+.endobot-supervision-messages time { display: block; }
+.endobot-supervision-loading, .endobot-supervision-empty { display: flex; align-items: center; gap: .45rem; color: var(--muted, #6d6b69); padding: .85rem; margin: 0; font-size: .86rem; }
+
+.endobot-supervision-composer { border-top: 1px solid rgba(67, 94, 92, .14); padding: .9rem 1.1rem 1rem; }
+.endobot-supervision-composer label { display: block; font-weight: 750; font-size: .85rem; margin-bottom: .42rem; }
+.endobot-supervision-composer textarea { box-sizing: border-box; display: block; width: 100%; resize: vertical; min-height: 5.1rem; background: #fffdf8; border: 1px solid rgba(67, 94, 92, .34); border-radius: .7rem; color: var(--ink, #2f3136); padding: .68rem; font: inherit; line-height: 1.4; }
+.endobot-supervision-composer textarea:focus { outline: 3px solid rgba(27, 107, 113, .2); border-color: #176b71; }
+.endobot-supervision-composer > div { display: flex; justify-content: space-between; align-items: center; gap: .8rem; margin-top: .55rem; }
+.endobot-supervision-composer button { white-space: nowrap; }
+
+@media (max-width: 760px) {
+  .endobot-supervision-workspace { grid-template-columns: 1fr; min-height: 0; }
+  .endobot-supervision-queue { border-right: 0; border-bottom: 1px solid rgba(67, 94, 92, .14); max-height: 16rem; }
+  .endobot-supervision-conversation__heading { display: grid; }
+  .endobot-supervision-conversation__heading > div:last-child { justify-items: start; }
+  .endobot-supervision-messages { max-height: 24rem; }
+  .endobot-supervision-composer > div { align-items: flex-end; }
+}
+
+@media (max-width: 440px) {
+  .endobot-supervision-conversation__heading, .endobot-supervision-messages, .endobot-supervision-composer { padding-left: .78rem; padding-right: .78rem; }
+  .endobot-supervision-composer > div { display: grid; }
+  .endobot-supervision-composer button { width: 100%; }
+}

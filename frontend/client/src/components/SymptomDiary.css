@@ -1,0 +1,88 @@
+.diary-cancel-edit { display: inline-flex; align-items: center; justify-content: center; gap: 7px; width: 100%; margin-top: 9px; border: 1px solid #dfd0dc; border-radius: 10px; padding: 10px 12px; color: #735d70; background: #fffafd; font: inherit; font-size: .8rem; font-weight: 800; cursor: pointer; transition: background-color 160ms ease, border-color 160ms ease, transform 160ms var(--ease-out, ease); }
+.diary-cancel-edit:hover { border-color: #a76a7f; background: #f8eef4; }.diary-cancel-edit:active { transform: scale(.98); }
+.record-row__actions { display: flex; align-items: center; gap: 5px; }.record-row__actions button { display: inline-flex; align-items: center; justify-content: center; min-height: 30px; border: 1px solid transparent; border-radius: 8px; }.record-row__actions .record-reopen { gap: 5px; padding: 0 8px; color: #765e73; background: #f5edf3; font: inherit; font-size: .69rem; font-weight: 800; white-space: nowrap; }.record-row__actions .record-delete { width: 30px; padding: 0; color: #86545c; background: #fff7f8; }.record-row__actions button:hover { border-color: #d7c4d4; background: #fff; }
+.pain-chart-wrap { position: relative; margin-top: 2px; border-radius: 14px; padding: 8px 8px 0 2px; background: linear-gradient(135deg, rgba(248, 238, 245, .72), rgba(255, 253, 254, .18)); }.pain-chart-direction { display: flex; align-items: center; gap: 8px; padding: 0 10px 3px 31px; color: #8a7085; font-size: .64rem; font-weight: 800; letter-spacing: .055em; text-transform: uppercase; }.pain-chart-direction i { min-width: 18px; height: 1px; flex: 1; background: linear-gradient(90deg, #e6cfdf, #ba7f9f); }.pain-chart-direction i::after { content: ""; display: block; width: 5px; height: 5px; margin-left: auto; transform: translateY(-2px) rotate(45deg); border-top: 1px solid #ba7f9f; border-right: 1px solid #ba7f9f; }
+.medication-hint { display: block; margin-top: 5px; color: #7e6a7b; font-size: .69rem; font-weight: 500; line-height: 1.35; }.medication-other-field { display: grid; gap: 6px; margin-top: 3px; }.medication-other-field input { width: 100%; }
+@media (max-width: 560px) { .record-row { align-items: center; }.record-row__actions { gap: 5px; }.record-row__actions button { min-height: 32px; }.record-row__actions .record-delete { width: 32px; } }
+
+/* Diário: navegação curta e campos com alinhamento previsível. */
+.diary-form { display: flex; flex-direction: column; min-width: 0; }
+.diary-form-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 23px; }
+.diary-form-heading h3, .diary-panel-heading h3, .records-title h3, .chart-title h3 { margin: 5px 0 0; color: #493747; font-family: "Playfair Display", serif; font-size: clamp(1.55rem, 2.2vw, 2.05rem); font-weight: 600; letter-spacing: -.045em; line-height: 1.03; }
+.diary-form-kicker, .diary-panel-kicker { color: #a76a7f; font-size: .64rem; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; }
+.diary-form-mark, .diary-panel-icon { display: grid; flex: 0 0 auto; place-items: center; width: 38px; height: 38px; border-radius: 13px 13px 13px 4px; color: #fff8fb; background: #7e486f; box-shadow: 0 8px 18px rgba(126, 72, 111, .18); }
+.form-grid { align-items: start; }
+.form-grid--top, .form-grid--balanced { margin-bottom: 17px; }
+.diary-field { align-content: start; min-width: 0; }
+.diary-field > span:first-child { min-height: 17px; }
+.diary-field input:not([type="range"]), .diary-field select { min-height: 46px; }
+.form-grid > .diary-field { align-self: start; }
+.diary-field--medication { min-height: 0; }
+.diary-field--medication .medication-hint { min-height: 38px; }
+.diary-notes-field { margin-top: 1px; }
+.diary-form .primary-button { margin-top: 21px; }
+
+.diary-insights { min-width: 0; gap: 14px; }
+.diary-view-nav { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 7px; padding: 6px; border: 1px solid rgba(223, 208, 220, .84); border-radius: 17px; background: rgba(255, 251, 253, .72); box-shadow: 0 8px 20px rgba(80, 52, 79, .06); }
+.diary-view-nav button { min-width: 0; min-height: 42px; display: inline-flex; align-items: center; justify-content: center; gap: 7px; border: 1px solid transparent; border-radius: 12px; color: #80677c; background: transparent; font-size: .76rem; font-weight: 800; transition: color 160ms ease, background-color 160ms ease, border-color 160ms ease, transform 160ms ease; }
+.diary-view-nav button:hover { color: #704664; background: #f8eef4; transform: translateY(-1px); }
+.diary-view-nav button.is-active { border-color: #ead3e1; color: #68435f; background: #fffdfd; box-shadow: 0 7px 15px rgba(91, 59, 77, .09); }
+.diary-panel { min-width: 0; border: 1px solid rgba(223, 208, 220, .84); border-radius: 26px; padding: 25px; background: #fffdfd; box-shadow: 0 18px 42px rgba(80, 52, 79, .10); }
+.diary-panel-heading, .latest-record-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+.diary-panel-heading h3 { max-width: 29ch; font-size: clamp(1.6rem, 2.45vw, 2.25rem); }
+.summary-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 9px; margin-top: 24px; }
+.summary-stat { min-width: 0; padding: 14px 13px 13px; border: 1px solid #eadde7; border-radius: 15px; background: #fbf6fa; }
+.summary-stat strong { display: block; overflow: hidden; color: #5b3d56; font-size: clamp(1.15rem, 2.1vw, 1.65rem); letter-spacing: -.035em; text-overflow: ellipsis; white-space: nowrap; }
+.summary-stat span { display: block; margin-top: 4px; color: #8b7387; font-size: .67rem; font-weight: 800; line-height: 1.25; }
+.summary-stat--accent { border-color: #e1c4d7; background: #f6e8f0; }
+.summary-stat--accent strong { color: #9a527b; }
+.latest-record-block { margin-top: 16px; padding: 17px; border: 1px solid #eadde7; border-radius: 18px 18px 6px 18px; background: linear-gradient(135deg, #fffafd, #f9f0f5); }
+.latest-record-heading { align-items: baseline; color: #5d4257; font-size: .82rem; font-weight: 900; }
+.latest-record-heading small { color: #957e90; font-size: .68rem; font-weight: 700; }
+.latest-record-metrics { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: 14px; }
+.latest-record-metrics span { min-width: 0; color: #8c7488; font-size: .64rem; line-height: 1.3; }
+.latest-record-metrics b { display: block; overflow: hidden; margin-bottom: 3px; color: #66435f; font-size: .83rem; text-overflow: ellipsis; white-space: nowrap; }
+.latest-record-block p { margin: 15px 0 0; color: #735d70; font-size: .78rem; line-height: 1.55; }
+.latest-record-footer { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin-top: 16px; padding-top: 13px; border-top: 1px solid #eadde7; }
+.latest-record-footer small { min-width: 0; overflow: hidden; color: #856f81; font-size: .67rem; text-overflow: ellipsis; white-space: nowrap; }
+.latest-record-footer .text-button { flex: 0 0 auto; min-height: auto; padding: 0; color: #8e4f7a !important; font-size: .72rem; }
+.diary-empty-state { margin-bottom: 2px !important; }
+
+.records-card, .chart-card { min-height: 360px; }
+.records-title, .chart-title { align-items: flex-start; margin-bottom: 16px; }
+.records-title h3, .chart-title h3 { margin-top: 5px; }
+.records-title small, .chart-title small { flex: 0 0 auto; padding-top: 4px; }
+.record-row { align-items: flex-start; padding: 15px 0; }
+.record-row__content { min-width: 0; flex: 1; }
+.record-row__content strong, .record-row__content span, .record-row__content p { overflow-wrap: anywhere; }
+.record-row__content p { margin: 8px 0 0; color: #806a7c; font-size: .75rem; line-height: 1.45; }
+.record-row__actions { flex: 0 0 auto; padding-top: 1px; }
+.chart-card .diary-panel-kicker { color: #f4c6c4 !important; }
+.chart-card .chart-title h3 { color: #fff6fa; }
+.chart-card .chart-title { margin-bottom: 16px; }
+.chart-card .pain-chart-wrap { margin-top: 0; }
+
+@media (max-width: 900px) {
+  .diary-panel-heading h3 { max-width: 35ch; }
+}
+
+@media (max-width: 560px) {
+  .diary-form-heading { margin-bottom: 19px; }
+  .diary-form-heading h3 { font-size: 1.8rem; }
+  .form-grid--top, .form-grid--balanced { gap: 15px; margin-bottom: 17px; }
+  .diary-view-nav { position: sticky; top: 132px; z-index: 4; gap: 4px; border-radius: 15px; }
+  .diary-view-nav button { min-height: 40px; gap: 5px; padding-inline: 5px; font-size: .68rem; }
+  .diary-panel { padding: 19px; border-radius: 22px; }
+  .summary-stats { gap: 6px; margin-top: 19px; }
+  .summary-stat { padding: 12px 9px; }
+  .summary-stat span { font-size: .61rem; }
+  .latest-record-block { padding: 14px; }
+  .latest-record-metrics { gap: 6px; }
+  .latest-record-footer { align-items: flex-start; flex-direction: column; gap: 9px; }
+  .latest-record-footer small { max-width: 100%; }
+  .records-card, .chart-card { min-height: 0; }
+  .record-row { gap: 9px; }
+  .record-row__actions .record-reopen span { display: none; }
+  .record-row__actions .record-reopen { width: 32px; padding: 0; }
+  .chart-card .pain-chart-wrap { padding-inline: 0; }
+}

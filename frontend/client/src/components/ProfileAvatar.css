@@ -1,0 +1,5 @@
+.profile-avatar { display: inline-grid; flex: 0 0 auto; place-items: center; overflow: hidden; border: 1px solid rgba(255, 255, 255, .78); border-radius: 50%; color: #fff8fb; background: linear-gradient(145deg, #875276, #bd778d); box-shadow: 0 5px 13px rgba(76, 44, 72, .15); font-family: "Manrope", sans-serif; font-size: 10px; font-weight: 850; letter-spacing: .04em; line-height: 1; }
+.profile-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.profile-avatar--small { width: 28px; height: 28px; }
+.profile-avatar--medium { width: 42px; height: 42px; }
+.profile-avatar--large { width: 78px; height: 78px; font-size: 18px; }

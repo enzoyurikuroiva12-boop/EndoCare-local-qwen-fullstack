@@ -1,0 +1,9 @@
+/* O posicionamento e o painel são fornecidos pelo widget oficial do VLibras. */
+.libras-accessibility [vw] { z-index: 120 !important; }
+.libras-accessibility [vw-access-button] { border: 1px solid rgba(255, 255, 255, .72); border-radius: 50%; box-shadow: 0 10px 24px rgba(62, 40, 61, .24); }
+.libras-accessibility__notice { position: fixed; z-index: 121; right: 20px; bottom: 76px; display: grid; gap: 8px; width: min(264px, calc(100vw - 40px)); margin: 0; padding: 10px 12px; border: 1px solid rgba(107, 76, 104, .18); border-radius: 12px; color: #5b4459; background: rgba(255, 250, 252, .97); box-shadow: 0 12px 28px rgba(62, 40, 61, .16); font-size: 12px; font-weight: 700; line-height: 1.42; }
+.libras-accessibility__notice button { justify-self: start; border: 1px solid #9b718f; border-radius: 7px; padding: 6px 8px; color: #553b51; background: #fff; font: inherit; font-size: 11px; font-weight: 800; cursor: pointer; }
+.libras-accessibility__notice button:hover, .libras-accessibility__notice button:focus-visible { border-color: #704a68; background: #f7edf5; outline: 2px solid rgba(112, 74, 104, .22); outline-offset: 2px; }
+@media (hover: hover) and (pointer: fine) { .libras-accessibility [vw-access-button]:hover { filter: brightness(1.04) saturate(1.05); } }
+@media (prefers-reduced-motion: reduce) { .libras-accessibility [vw-access-button] { transition: none !important; } }
+@media (max-width: 560px) { .libras-accessibility__notice { right: 14px; bottom: 68px; width: min(254px, calc(100vw - 28px)); } }

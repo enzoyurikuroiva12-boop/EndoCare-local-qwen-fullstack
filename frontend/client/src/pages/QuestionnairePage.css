@@ -1,0 +1,44 @@
+.questionnaire-page #questionario-page-main {
+  overflow: hidden;
+}
+
+.questionnaire-page .questionnaire-section {
+  min-height: calc(100vh - 118px);
+}
+
+.questionnaire-page .questionnaire-section::after {
+  position: absolute;
+  right: 8%;
+  bottom: 8%;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  content: "";
+  background: #c9909b;
+  box-shadow: 18px -12px 0 #e7c4c4, 36px 4px 0 #d8b7cf;
+  opacity: .65;
+}
+
+.questionnaire-page .topnav .is-current {
+  color: #7e486f;
+  font-weight: 800;
+}
+
+@media (max-width: 900px) {
+  .questionnaire-page .questionnaire-section {
+    min-height: auto;
+  }
+}
+
+@media (max-width: 560px) {
+  .questionnaire-page .questionnaire-section::after {
+    right: 10%;
+    bottom: 4%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .questionnaire-page .questionnaire-section::after {
+    display: none;
+  }
+}

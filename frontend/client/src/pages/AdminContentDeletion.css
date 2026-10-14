@@ -1,0 +1,12 @@
+.admin-delete-content { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 34px; border: 1px solid #d9b7bf; border-radius: 8px; padding: 0 10px; color: #8e4d59; background: transparent; font: inherit; font-size: 11px; font-weight: 850; cursor: pointer; transition: transform 160ms var(--ease-out, ease), background-color 160ms ease, border-color 160ms ease; }
+.admin-delete-content:hover { border-color: #b96f7d; background: #fff2f3; }
+.admin-delete-content:active { transform: scale(.97); }
+.admin-story__actions { align-items: center; }
+.content-status { padding: 4px 8px; border-radius: 99px; font-size: 10px; font-style: normal; font-weight: 850; }
+.content-status.is-approved { color: #3f6039; background: #edf6ea; }
+.content-status.is-rejected { color: #914f5c; background: #fff0f1; }
+.admin-post-list__actions { display: inline-flex !important; align-items: center; gap: 8px; }
+@media (max-width: 600px) {
+  .admin-story__actions { flex-wrap: wrap; }
+  .admin-post-list__actions { width: 100%; justify-content: space-between; }
+}

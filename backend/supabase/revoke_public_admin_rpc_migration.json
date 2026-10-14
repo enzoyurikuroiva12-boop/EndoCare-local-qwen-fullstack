@@ -1,0 +1,5 @@
+{
+  "project_id": "bhebvxqlovhsykfmxeln",
+  "name": "revoke_public_admin_rpc",
+  "query": "revoke execute on function public.is_endoacolhe_admin() from public;\nrevoke execute on function public.is_endoacolhe_admin() from anon;\ngrant execute on function public.is_endoacolhe_admin() to authenticated;"
+}

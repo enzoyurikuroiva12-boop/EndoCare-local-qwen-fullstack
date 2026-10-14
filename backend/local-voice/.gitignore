@@ -1,0 +1,7 @@
+.venv/
+models/
+.uv-cache/
+*.log
+*.pid
+__pycache__/
+*.wav

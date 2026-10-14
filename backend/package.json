@@ -1,0 +1,25 @@
+{
+  "name": "endoacolhe-backend-vercel",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev:local": "node scripts/start-local.mjs",
+    "build": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild"
+    ]
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.57.4",
+    "@vercel/node": "^5.10.2"
+  },
+  "devDependencies": {
+    "@types/node": "^24.7.0",
+    "tsx": "4.20.6",
+    "typescript": "^5.9.3",
+    "vitest": "^2.1.9"
+  }
+}

@@ -1,0 +1,10 @@
+# Native Windows / Python 3.12. Install PyTorch from the official CUDA index first.
+omnivoice==0.2.1
+transformers==5.3.0
+fastapi==0.143.0
+uvicorn==0.54.0
+faster-whisper==1.2.1
+# PyAV 19 removed metadata_errors, still used by faster-whisper 1.2.1.
+av==16.1.0
+python-multipart==0.0.32
+soundfile==0.13.1

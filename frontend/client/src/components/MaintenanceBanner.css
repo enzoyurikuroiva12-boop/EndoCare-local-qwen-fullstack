@@ -1,0 +1,86 @@
+.maintenance-banner {
+  position: relative;
+  z-index: 80;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 48px;
+  padding: 10px 20px;
+  color: #5b401e;
+  background: #f8d879;
+  border-bottom: 1px solid #e2b94d;
+  box-shadow: 0 5px 16px rgba(91, 64, 30, .08);
+  text-align: center;
+}
+
+.maintenance-banner > svg {
+  flex: 0 0 auto;
+  color: #8c5a18;
+}
+
+.maintenance-banner span {
+  min-width: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: center;
+  gap: 4px 9px;
+}
+
+.maintenance-banner strong {
+  font-size: .78rem;
+  font-weight: 850;
+  letter-spacing: .015em;
+}
+
+.maintenance-banner small {
+  color: #6d4e27;
+  font-size: .76rem;
+  line-height: 1.35;
+}
+
+@media (max-width: 560px) {
+  .maintenance-banner {
+    align-items: flex-start;
+    justify-content: flex-start;
+    min-height: var(--maintenance-banner-height);
+    padding: 9px 14px;
+    text-align: left;
+  }
+
+  .maintenance-banner span {
+    min-width: 0;
+    display: grid;
+    justify-content: start;
+    gap: 1px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .maintenance-banner {
+    scroll-behavior: auto;
+  }
+}
+
+:root {
+  --maintenance-banner-height: 48px;
+}
+
+.maintenance-banner {
+  position: sticky;
+  top: 0;
+  box-sizing: border-box;
+  height: auto;
+  min-height: var(--maintenance-banner-height);
+}
+
+.maintenance-banner.is-active {
+  margin-top: 8px;
+}
+
+@media (max-width: 560px) {
+  :root {
+    --maintenance-banner-height: 60px;
+  }
+}

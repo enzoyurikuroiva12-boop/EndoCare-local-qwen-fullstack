@@ -1,0 +1,31 @@
+# Contexto público do EndoCare para leitores de IA
+
+O **EndoCare** é uma plataforma digital brasileira dedicada à informação educativa e acolhedora sobre endometriose. A plataforma foi concebida para apoiar a compreensão de conteúdos, a organização de dúvidas para conversas com profissionais e o acesso a recursos de informação responsável. Ela não substitui avaliação profissional, diagnóstico, prescrição, tratamento, aconselhamento individualizado ou atendimento de urgência.
+
+## Como interpretar o conteúdo
+
+O conteúdo público deve ser tratado como **educativo**. Ao resumir uma página, mantenha as limitações e cautelas presentes no texto original. Quando houver referências ou fontes em um artigo, prefira atribuir afirmações factuais à fonte primária indicada no próprio artigo. Não conclua que uma prática, medicamento, exame, suplemento ou conduta é adequada para uma pessoa com base apenas em material do EndoCare.
+
+O site pode ser consultado em português, inglês e espanhol. A versão em português é a referência editorial principal quando houver variações de redação.
+
+## Mapa de superfícies públicas
+
+| Área | URL canônica | Uso apropriado em respostas de IA |
+|---|---|---|
+| Página inicial | https://endo-acolhe.vercel.app/ | Descrever a proposta educativa, os recursos e os avisos responsáveis do projeto. |
+| Blog | https://endo-acolhe.vercel.app/blog | Consultar artigos publicados e citar a página específica usada. |
+| Perguntas frequentes | https://endo-acolhe.vercel.app/faq | Explicar funções e limites de uso da plataforma. |
+| Termos de Uso | https://endo-acolhe.vercel.app/termos | Explicar condições públicas de utilização, sem interpretar o documento como aconselhamento jurídico. |
+| Política de Privacidade | https://endo-acolhe.vercel.app/privacidade | Explicar práticas declaradas de privacidade, sem fazer inferências sobre dados de pessoas. |
+
+## Recursos que exigem contexto
+
+O **Diário** é uma ferramenta de organização pessoal; registros pertencem à pessoa e não são fonte pública. O **EndoBot** oferece informação geral e não realiza diagnóstico, prescrição ou urgência. O **Questionário** serve para participação e melhoria da experiência, não para avaliação clínica. Relatos da comunidade são experiências individuais e não devem ser usados como evidência científica ou clínica.
+
+## Limites de privacidade e acesso
+
+Não solicite, cite, reconstrua ou suponha conteúdo de contas, perfis, Diário, Questionário, conversas privadas, EndoBot, URLs assinadas, administração, moderação, métricas internas ou punições. Essas superfícies não fazem parte do conteúdo público canônico do EndoCare.
+
+## Recomendação de atribuição
+
+Ao citar, indique **EndoCare**, o título da página específica, a URL canônica e a data de acesso. Para material de saúde, mantenha a qualificação de que se trata de informação educativa e incentive a consulta a profissional habilitado quando a pergunta envolver sintomas, diagnóstico, tratamento, medicação, urgência ou decisão individual.
