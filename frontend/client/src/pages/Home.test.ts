@@ -1,10 +1,10 @@
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { describe, expect, it, vi } from "vitest";
 
 vi.mock("@/lib/supabase", () => ({ supabase: { auth: {} } }));
 
-import { educationalVideoUrl, plantCatalog, searchGuideCopy, videoGuideCopy } from "./Home";
+import { homePresentationVideoUrl, plantCatalog, searchGuideCopy, videoGuideCopy } from "./Home";
 
 const acolhedoraTheme = readFileSync(resolve(process.cwd(), "client/src/styles/AcolhedoraTheme.css"), "utf8");
 const indexCss = readFileSync(resolve(process.cwd(), "client/src/index.css"), "utf8");
@@ -32,20 +32,21 @@ describe("videoGuideCopy", () => {
     expect(Object.keys(videoGuideCopy).sort()).toEqual(["en", "es", "pt"]);
 
     for (const copy of Object.values(videoGuideCopy)) {
-      expect(copy.metadata).toContain("2 min");
+      expect(copy.metadata).toContain("10 s");
       expect(copy.points).toHaveLength(3);
       expect(copy.notice).toBeTruthy();
       expect(copy.sourceItems).toHaveLength(4);
       expect(copy.fallback).toBeTruthy();
     }
 
-    expect(videoGuideCopy.pt.audioNote).toContain("português brasileiro");
-    expect(videoGuideCopy.en.audioNote).toContain("Brazilian Portuguese");
-    expect(videoGuideCopy.es.audioNote).toContain("portugués brasileño");
-    expect(videoGuideCopy.pt.points[0]).toContain("útero");
-    expect(videoGuideCopy.en.points[0]).toContain("uterus");
-    expect(videoGuideCopy.es.points[0]).toContain("útero");
-    expect(educationalVideoUrl).toMatch(/^https:\/\/files\.manuscdn\.com\/.*\.mp4$/);
+    expect(videoGuideCopy.pt.audioNote).toContain("silenciar");
+    expect(videoGuideCopy.en.audioNote).toContain("turn the audio on or off");
+    expect(videoGuideCopy.es.audioNote).toContain("silenciar el audio");
+    expect(videoGuideCopy.pt.points[0]).toContain("conteúdos informativos");
+    expect(videoGuideCopy.en.points[0]).toContain("informational content");
+    expect(videoGuideCopy.es.points[0]).toContain("contenido informativo");
+    expect(homePresentationVideoUrl).toBe("/videos/endocare-apresentacao.mp4");
+    expect(existsSync(resolve(process.cwd(), "client/public/videos/endocare-apresentacao.mp4"))).toBe(true);
   });
 });
 

@@ -36,42 +36,42 @@ export const plantCatalog = {
 
 export const videoGuideCopy = {
   pt: {
-    title: <>Endometriose, com informação que <em>acolhe</em>.</>,
-    text: "Um vídeo educativo para compreender por que os sintomas merecem escuta, como se organiza uma conversa de cuidado e quais são os limites responsáveis da fitoterapia.",
-    metadata: "2 min · áudio em português brasileiro",
-    toplineMetadata: "2 min",
-    transcript: "O que o vídeo aborda",
-    points: ["Anatomia básica com setas para útero, tuba uterina e ovário; os focos mostrados são apenas ilustrativos.", "Sinais que merecem conversa, registro e atenção profissional.", "Fitoterapia em perspectiva: uso complementar não é prescrição nem substituição de cuidado."],
-    notice: "Conteúdo informativo. Não substitui avaliação, diagnóstico, prescrição nem acompanhamento de um profissional.",
-    sources: "Roteiro e referências clínicas",
+    title: <>Conheça o EndoCare: informação que <em>acolhe</em>.</>,
+    text: "Uma apresentação breve da plataforma EndoCare, criada para aproximar informação clara e ferramentas de cuidado de quem convive com endometriose.",
+    metadata: "10 s · vídeo de apresentação",
+    toplineMetadata: "Apresentação",
+    transcript: "Conheça a plataforma",
+    points: ["Encontre conteúdos informativos sobre endometriose.", "Explore ferramentas para organizar sintomas e preparar conversas de cuidado.", "Use informações como apoio, sem substituir a orientação profissional."],
+    notice: "O EndoCare compartilha conteúdo informativo. Não substitui avaliação, diagnóstico ou acompanhamento profissional.",
+    sources: "Fontes sobre endometriose",
     sourceItems: ["OMS", "Ministério da Saúde — Endometriose", "ESHRE", "Ministério da Saúde — Fitoterápicos"],
-    audioNote: "A narração deste vídeo está em português brasileiro.",
+    audioNote: "Use os controles do vídeo para ativar ou silenciar o áudio.",
     fallback: "Seu navegador não suporta a reprodução deste vídeo.",
   },
   en: {
-    title: <>Endometriosis, with information that <em>welcomes</em>.</>,
-    text: "An educational video about why symptoms deserve to be heard, how to prepare a care conversation, and the responsible limits of phytotherapy.",
-    metadata: "2 min · audio in Brazilian Portuguese",
-    toplineMetadata: "2 min",
-    transcript: "What the video covers",
-    points: ["Basic anatomy with arrows to the uterus, fallopian tube and ovary; the foci shown are illustrative only.", "Signs worth discussing, recording and bringing to professional care.", "Phytotherapy in context: complementary use is not a prescription or a replacement for care."],
-    notice: "Informational content. It does not replace assessment, diagnosis, prescription or professional follow-up.",
-    sources: "Script and clinical references",
+    title: <>Meet EndoCare: information that <em>welcomes</em>.</>,
+    text: "A short introduction to EndoCare, a platform bringing clear information and care tools closer to people living with endometriosis.",
+    metadata: "10 sec · platform introduction",
+    toplineMetadata: "Introduction",
+    transcript: "Explore the platform",
+    points: ["Find informational content about endometriosis.", "Explore tools to organize symptoms and prepare for care conversations.", "Use information as support, not as a replacement for professional guidance."],
+    notice: "EndoCare provides informational content. It does not replace professional assessment, diagnosis or follow-up.",
+    sources: "Endometriosis sources",
     sourceItems: ["WHO", "Brazilian Ministry of Health — Endometriosis", "ESHRE", "Brazilian Ministry of Health — Herbal medicines"],
-    audioNote: "This video is narrated in Brazilian Portuguese.",
+    audioNote: "Use the video controls to turn the audio on or off.",
     fallback: "Your browser does not support video playback.",
   },
   es: {
-    title: <>Endometriosis, con información que <em>acoge</em>.</>,
-    text: "Un vídeo educativo para comprender por qué los síntomas merecen escucha, cómo preparar una conversación de cuidado y cuáles son los límites responsables de la fitoterapia.",
-    metadata: "2 min · audio en portugués brasileño",
-    toplineMetadata: "2 min",
-    transcript: "Qué aborda el video",
-    points: ["Anatomía básica con flechas hacia útero, trompa uterina y ovario; los focos mostrados son solo ilustrativos.", "Señales que vale la pena conversar, registrar y llevar a la atención profesional.", "Fitoterapia en perspectiva: el uso complementario no es prescripción ni sustituto del cuidado."],
-    notice: "Contenido informativo. No sustituye evaluación, diagnóstico, prescripción ni seguimiento profesional.",
-    sources: "Guion y referencias clínicas",
+    title: <>Conoce EndoCare: información que <em>acoge</em>.</>,
+    text: "Una breve presentación de la plataforma EndoCare, que acerca información clara y herramientas de cuidado a quienes conviven con endometriosis.",
+    metadata: "10 s · presentación de la plataforma",
+    toplineMetadata: "Presentación",
+    transcript: "Conoce la plataforma",
+    points: ["Encuentra contenido informativo sobre endometriosis.", "Explora herramientas para organizar síntomas y preparar conversaciones de cuidado.", "Usa la información como apoyo, sin sustituir la orientación profesional."],
+    notice: "EndoCare ofrece contenido informativo. No sustituye la evaluación, el diagnóstico ni el seguimiento profesional.",
+    sources: "Fuentes sobre endometriosis",
     sourceItems: ["OMS", "Ministerio de Salud de Brasil — Endometriosis", "ESHRE", "Ministerio de Salud de Brasil — Fitoterápicos"],
-    audioNote: "La narración de este video está en portugués brasileño.",
+    audioNote: "Usa los controles del video para activar o silenciar el audio.",
     fallback: "Tu navegador no admite la reproducción de este video.",
   },
 } as const;
@@ -83,7 +83,7 @@ const videoSources = [
   "https://www.gov.br/saude/pt-br/composicao/sectics/plantas-medicinais-e-fitoterapicos",
 ] as const;
 
-export const educationalVideoUrl = "https://files.manuscdn.com/user_upload_by_module/session_file/310519663158289817/ArNoPReUajRRUOXj.mp4";
+export const homePresentationVideoUrl = "/videos/endocare-apresentacao.mp4";
 
 const chromeCopy = {
   pt: { brandLabel: "Voltar ao início", navLabel: "Navegação principal", menuLabel: "Abrir menu" },
@@ -218,7 +218,7 @@ export default function Home() {
             <div className="video-surface">
           <div className="video-surface-topline"><span><CirclePlay size={15} /> EndoCare</span><span>{video.toplineMetadata}</span></div>
               <video className="educational-video" controls preload="metadata" playsInline aria-describedby="video-guide-audio-note video-guide-notice">
-                <source src={educationalVideoUrl} type="video/mp4" />
+                <source src={homePresentationVideoUrl} type="video/mp4" />
                 {video.fallback}
               </video>
               <p className="video-audio-note" id="video-guide-audio-note"><Captions size={15} /> {video.audioNote}</p>
