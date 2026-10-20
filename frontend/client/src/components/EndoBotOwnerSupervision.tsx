@@ -40,6 +40,8 @@ const copy = {
     onlyPaused: "Pause a conversa antes de responder como equipe humana. A pessoa verá a identificação da equipe.",
     live: "Atualizações em tempo real ativas",
     error: "Não foi possível atualizar esta supervisão agora.",
+    sendError: "Não foi possível enviar a resposta. Confira a conexão e tente novamente.",
+    sendTimeout: "Não foi possível confirmar o envio a tempo. Atualize a conversa antes de tentar novamente.",
     pauseTitle: "Assumir esta conversa como equipe humana?",
     pauseDescription: "O EndoBot deixará de gerar respostas automáticas nesta conversa até você retomar a automação. A pessoa receberá um aviso claro de que a equipe humana assumiu.",
     confirmPause: "Pausar e assumir",
@@ -70,6 +72,8 @@ const copy = {
     onlyPaused: "Pause the conversation before replying as the human team. The person will see the team identification.",
     live: "Live updates active",
     error: "This supervision view could not be updated right now.",
+    sendError: "The reply could not be sent. Check the connection and try again.",
+    sendTimeout: "The reply could not be confirmed in time. Refresh the conversation before trying again.",
     pauseTitle: "Take over this conversation as the human team?",
     pauseDescription: "EndoBot will stop generating automatic answers in this conversation until automation is resumed. The person will receive a clear notice that the human team has taken over.",
     confirmPause: "Pause and take over",
@@ -100,6 +104,8 @@ const copy = {
     onlyPaused: "Pausa la conversación antes de responder como equipo humano. La persona verá la identificación del equipo.",
     live: "Actualizaciones en tiempo real activas",
     error: "No fue posible actualizar esta supervisión ahora.",
+    sendError: "No se pudo enviar la respuesta. Comprueba la conexión e inténtalo de nuevo.",
+    sendTimeout: "No se pudo confirmar el envío a tiempo. Actualiza la conversación antes de intentarlo de nuevo.",
     pauseTitle: "¿Asumir esta conversación como equipo humano?",
     pauseDescription: "EndoBot dejará de generar respuestas automáticas en esta conversación hasta que reanudes la automatización. La persona recibirá un aviso claro de que el equipo humano asumió.",
     confirmPause: "Pausar y asumir",
@@ -129,23 +135,32 @@ export function EndoBotOwnerSupervision({ language, locale }: { language: SiteLa
 
   const loadQueue = useCallback(async () => {
     setLoading(true);
-    const { data, error } = await supabase.rpc("list_endoacolhe_human_supervision_conversations", { p_limit: 40 });
-    if (error) {
+    try {
+      const { data, error } = await supabase.rpc("list_endoacolhe_human_supervision_conversations", { p_limit: 40 }).abortSignal(AbortSignal.timeout(12_000));
+      if (error) {
+        setNotice(t.error);
+        return;
+      }
+      const nextQueue = (data ?? []) as SupervisionConversation[];
+      setQueue(nextQueue);
+      setSelectedId((current) => nextQueue.some((conversation) => conversation.id === current) ? current : nextQueue[0]?.id ?? null);
+    } catch {
       setNotice(t.error);
+    } finally {
       setLoading(false);
-      return;
     }
-    const nextQueue = (data ?? []) as SupervisionConversation[];
-    setQueue(nextQueue);
-    setSelectedId((current) => nextQueue.some((conversation) => conversation.id === current) ? current : nextQueue[0]?.id ?? null);
-    setLoading(false);
   }, [t.error]);
 
   const loadMessages = useCallback(async (conversationId: string) => {
     setLoadingMessages(true);
-    const { data, error } = await supabase.rpc("list_endoacolhe_human_supervision_messages", { p_conversation_id: conversationId });
-    if (error) setNotice(t.error); else setMessages((data ?? []) as SupervisionMessage[]);
-    setLoadingMessages(false);
+    try {
+      const { data, error } = await supabase.rpc("list_endoacolhe_human_supervision_messages", { p_conversation_id: conversationId }).abortSignal(AbortSignal.timeout(12_000));
+      if (error) setNotice(t.error); else setMessages((data ?? []) as SupervisionMessage[]);
+    } catch {
+      setNotice(t.error);
+    } finally {
+      setLoadingMessages(false);
+    }
   }, [t.error]);
 
   useEffect(() => { void loadQueue(); }, [loadQueue]);
@@ -181,9 +196,25 @@ export function EndoBotOwnerSupervision({ language, locale }: { language: SiteLa
     if (!selectedConversation || selectedConversation.human_takeover_status !== "paused" || sending || !isHumanSupervisionReplyValid(content)) return;
     setSending(true);
     setNotice("");
-    const { error } = await supabase.rpc("add_endoacolhe_human_supervision_reply", { p_conversation_id: selectedConversation.id, p_content: content });
-    if (error) setNotice(t.error); else { setDraft(""); await loadMessages(selectedConversation.id); await loadQueue(); }
-    setSending(false);
+    try {
+      const { data, error } = await supabase.rpc("add_endoacolhe_human_supervision_reply", { p_conversation_id: selectedConversation.id, p_content: content }).abortSignal(AbortSignal.timeout(15_000));
+      if (error) {
+        console.error("[EndoBot] Falha ao enviar resposta da equipe humana", error.code);
+        setNotice(t.sendError);
+        return;
+      }
+      const savedMessage = (Array.isArray(data) ? data[0] : data) as SupervisionMessage | undefined;
+      setDraft("");
+      if (savedMessage?.id && savedMessage.role === "human") {
+        setMessages((current) => current.some((message) => message.id === savedMessage.id) ? current : [...current, savedMessage]);
+      }
+      void Promise.all([loadMessages(selectedConversation.id), loadQueue()]);
+    } catch (error) {
+      console.error("[EndoBot] Falha ao confirmar resposta da equipe humana", error instanceof Error ? error.name : "erro desconhecido");
+      setNotice(error instanceof DOMException && error.name === "TimeoutError" ? t.sendTimeout : t.sendError);
+    } finally {
+      setSending(false);
+    }
   }
 
   return <section id="admin-endobot-supervision" className="admin-panel endobot-supervision-panel" aria-labelledby="endobot-supervision-title">
