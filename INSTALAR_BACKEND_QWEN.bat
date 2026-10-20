@@ -27,8 +27,19 @@ if errorlevel 1 (
 )
 if not exist "backend\.env" copy /Y "backend\.env.example" "backend\.env" >nul
 cd backend
-call pnpm.cmd install
+call pnpm.cmd install --frozen-lockfile
 if errorlevel 1 goto :error
+node --import tsx -e "process.exit(0)" >nul 2>nul
+if errorlevel 1 (
+  echo A instalacao das dependencias ficou incompleta. Reparando os pacotes do backend...
+  call pnpm.cmd install --force --frozen-lockfile
+  if errorlevel 1 goto :error
+)
+node --import tsx -e "process.exit(0)" >nul 2>nul
+if errorlevel 1 (
+  echo O pacote tsx ainda nao pode ser carregado. Confira a instalacao do Node.js e do pnpm.
+  goto :error
+)
 ollama list >nul 2>nul
 if errorlevel 1 (
   echo Iniciando o servico Ollama...

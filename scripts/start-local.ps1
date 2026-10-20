@@ -126,8 +126,14 @@ try {
     $taskBackendServer = Join-Path $taskBackendDirectory 'scripts\local-server.ts'
     $taskFrontendWrapper = Join-Path $taskFrontendRoot 'scripts\start-frontend.mjs'
     $taskFrontendServer = Join-Path $taskFrontendDirectory 'node_modules\vite\bin\vite.js'
-    if (-not (Test-Path -LiteralPath $taskFrontendServer) -or
-        -not (Test-Path -LiteralPath (Join-Path $taskBackendDirectory 'node_modules\tsx\package.json'))) {
+    Push-Location $taskBackendDirectory
+    try {
+        & $taskNode --import tsx --eval 'process.exit(0)' 2>$null
+        $taskTsxAvailable = $LASTEXITCODE -eq 0
+    } finally {
+        Pop-Location
+    }
+    if (-not (Test-Path -LiteralPath $taskFrontendServer) -or -not $taskTsxAvailable) {
         throw 'Instale as dependencias com INSTALAR_ENDOCARE.bat e INSTALAR_BACKEND_QWEN.bat primeiro.'
     }
     New-Item -ItemType Directory -Path $taskStateDirectory -Force | Out-Null
