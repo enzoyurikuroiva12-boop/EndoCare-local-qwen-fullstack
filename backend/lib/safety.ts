@@ -10,5 +10,5 @@ export function sanitizeQuestion(value: string) {
 }
 
 export function blockedAnswer() {
-  return "Posso ajudar com informações gerais sobre endometriose e como organizar perguntas para seu atendimento.";
+  return "Não posso fazer isso.";
 }
