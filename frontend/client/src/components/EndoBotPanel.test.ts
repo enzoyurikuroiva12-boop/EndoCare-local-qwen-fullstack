@@ -17,6 +17,9 @@ describe("endoBotCopy", () => {
       expect(copy.available).toBeTruthy();
       expect(copy.unavailableStatus).toBeTruthy();
       expect(copy.serviceUnavailable).toBeTruthy();
+      expect(copy.voiceLoading).toBeTruthy();
+      expect(copy.voiceStatusUnavailable).toBeTruthy();
+      expect(copy.microphonePermission).toBeTruthy();
       expect(copy.humanConsentTitle).toBeTruthy();
       expect(copy.humanConsentLabel).toBeTruthy();
       expect(copy.humanTeamTakenOver).toBeTruthy();

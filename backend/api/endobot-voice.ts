@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { isAllowedEndoBotOrigin } from "../lib/cors.js";
-import { LocalVoiceError, synthesizeLocalSpeech, transcribeLocalAudio } from "../lib/localVoice.js";
+import { getLocalVoiceStatus, LocalVoiceError, synthesizeLocalSpeech, transcribeLocalAudio } from "../lib/localVoice.js";
 
 const MAX_AUDIO_BYTES = 8 * 1024 * 1024;
 const MAX_AUDIO_BASE64_CHARS = Math.ceil(MAX_AUDIO_BYTES * 4 / 3) + 32;
@@ -15,7 +15,7 @@ function cors(request: VercelRequest, response: VercelResponse) {
   response.setHeader("Cache-Control", "no-store");
   response.setHeader("X-Content-Type-Options", "nosniff");
   response.setHeader("Access-Control-Allow-Headers", "Authorization, Content-Type");
-  response.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
+  response.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
   return true;
 }
 
@@ -55,6 +55,7 @@ function publicEndoBotUrl() {
 export default async function handler(request: VercelRequest, response: VercelResponse) {
   if (!cors(request, response)) return response.status(403).json({ error: "Origem não permitida." });
   if (request.method === "OPTIONS") return response.status(204).end();
+  if (request.method === "GET") return response.status(200).json(await getLocalVoiceStatus());
   if (request.method !== "POST") return response.status(405).json({ error: "Método não permitido." });
   if (!withinLimit(clientKey(request))) return response.status(429).json({ error: "Aguarde um minuto antes de usar o modo de voz novamente." });
 

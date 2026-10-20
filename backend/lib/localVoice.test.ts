@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { getLocalVoiceUrl, synthesizeLocalSpeech, transcribeLocalAudio } from "./localVoice.js";
+import { getLocalVoiceStatus, getLocalVoiceUrl, synthesizeLocalSpeech, transcribeLocalAudio } from "./localVoice.js";
 
 function wav() {
   const bytes = Buffer.alloc(48);
@@ -18,6 +18,21 @@ describe("EndoBot local voice", () => {
       vi.stubEnv("OMNIVOICE_BASE_URL", address);
       expect(() => getLocalVoiceUrl()).toThrow();
     }
+  });
+
+  it("reports only safe ASR and TTS readiness states to the frontend", async () => {
+    vi.stubEnv("OMNIVOICE_BASE_URL", "http://127.0.0.1:7862");
+    const fetchMock = vi.fn()
+      .mockResolvedValueOnce(Response.json({ service: "endobot-local-voice", status: "loading", asr: "ready", tts: "loading", device: "cuda:0" }))
+      .mockResolvedValueOnce(Response.json({ service: "endobot-local-voice", status: "ready", asr: "ready", tts: "ready", device: "cuda:0" }))
+      .mockRejectedValueOnce(new Error("connection refused"));
+    vi.stubGlobal("fetch", fetchMock);
+
+    await expect(getLocalVoiceStatus()).resolves.toEqual({ status: "loading", asr: "ready", tts: "loading" });
+    await expect(getLocalVoiceStatus()).resolves.toEqual({ status: "ready", asr: "ready", tts: "ready" });
+    await expect(getLocalVoiceStatus()).resolves.toEqual({ status: "unavailable", asr: "unavailable", tts: "unavailable" });
+    expect(fetchMock).toHaveBeenCalledTimes(3);
+    expect(fetchMock.mock.calls.every(([url]) => url === "http://127.0.0.1:7862/health")).toBe(true);
   });
 
   it("returns real WAV bytes from OmniVoice without a cloud key", async () => {

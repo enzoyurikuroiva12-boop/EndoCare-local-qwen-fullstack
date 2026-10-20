@@ -12,6 +12,20 @@ function response() {
 afterEach(() => { vi.unstubAllGlobals(); vi.unstubAllEnvs(); });
 
 describe("EndoBot recorded voice", () => {
+  it("exposes local voice readiness without consuming a recording rate limit", async () => {
+    vi.stubEnv("OMNIVOICE_BASE_URL", "http://127.0.0.1:7862");
+    vi.stubEnv("FRONTEND_ORIGIN", "http://localhost:5173");
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(Response.json({
+      service: "endobot-local-voice", status: "loading", asr: "ready", tts: "loading",
+    })));
+    const req = { method: "GET", headers: { origin: "http://localhost:5173" }, socket: { remoteAddress: "test-voice-status" } } as unknown as VercelRequest;
+    const res = response();
+    await handler(req, res as unknown as VercelResponse);
+    expect(res.code).toBe(200);
+    expect(res.payload).toEqual({ status: "loading", asr: "ready", tts: "loading" });
+    expect(res.setHeader).toHaveBeenCalledWith("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+  });
+
   it("returns only the transcript so the frontend can persist the message before chat", async () => {
     vi.stubEnv("ENDOBOT_ASR_PROVIDER", "local");
     vi.stubEnv("OMNIVOICE_BASE_URL", "http://127.0.0.1:7862");

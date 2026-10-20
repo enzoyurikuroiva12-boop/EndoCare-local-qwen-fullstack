@@ -22,6 +22,24 @@ export function voiceTimeoutMs() {
   return Number.isFinite(value) ? Math.min(240_000, Math.max(5_000, value)) : 180_000;
 }
 
+export async function getLocalVoiceStatus() {
+  try {
+    const response = await fetch(`${getLocalVoiceUrl()}/health`, {
+      cache: "no-store",
+      signal: AbortSignal.timeout(4_000),
+    });
+    if (!response.ok) return { status: "unavailable", asr: "unavailable", tts: "unavailable" } as const;
+    const health = await response.json().catch(() => null) as { service?: unknown; status?: unknown; asr?: unknown; tts?: unknown } | null;
+    if (health?.service !== "endobot-local-voice") return { status: "unavailable", asr: "unavailable", tts: "unavailable" } as const;
+    const asr = health.asr === "ready" ? "ready" : health.asr === "loading" ? "loading" : "unavailable";
+    const tts = health.tts === "ready" ? "ready" : health.tts === "loading" ? "loading" : "unavailable";
+    const status = asr === "ready" && tts === "ready" ? "ready" : asr === "unavailable" || tts === "unavailable" || health.status === "error" ? "unavailable" : "loading";
+    return { status, asr, tts } as const;
+  } catch {
+    return { status: "unavailable", asr: "unavailable", tts: "unavailable" } as const;
+  }
+}
+
 async function serviceError(response: Response, fallback: string, code = "tts_unavailable") {
   const payload = await response.json().catch(() => null) as { detail?: unknown } | null;
   const message = typeof payload?.detail === "string" ? payload.detail : fallback;

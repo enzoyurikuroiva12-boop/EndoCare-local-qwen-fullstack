@@ -64,6 +64,9 @@ export const endoBotCopy = {
     voiceProcessing: "Ouvindo e preparando resposta…",
     voicePlaying: "Reproduzindo resposta",
     voiceUnavailable: "O modo de voz está indisponível. Use o chat textual.",
+    voiceLoading: "Carregando a voz local. O botão será liberado quando ela estiver pronta.",
+    voiceStatusUnavailable: "Voz local indisponível. Verifique se o OmniVoice está instalado e inicie o EndoCare.",
+    microphonePermission: "Permita o acesso ao microfone nas configurações do navegador para falar com o EndoBot.",
     voiceDisclosure: "A resposta de voz é gerada por IA e o áudio não é armazenado permanentemente.",
     voiceLocal: "Voz feminina acolhedora. Áudio gerado neste computador e não armazenado permanentemente.",
     hearReply: "Ouvir resposta",
@@ -136,6 +139,9 @@ export const endoBotCopy = {
     voiceProcessing: "Listening and preparing a reply…",
     voicePlaying: "Playing reply",
     voiceUnavailable: "Voice mode is unavailable. Use text chat.",
+    voiceLoading: "Loading local voice. The button will be enabled when it is ready.",
+    voiceStatusUnavailable: "Local voice is unavailable. Check that OmniVoice is installed, then start EndoCare.",
+    microphonePermission: "Allow microphone access in your browser settings to talk with EndoBot.",
     voiceDisclosure: "The spoken reply is AI-generated and audio is not stored permanently.",
     voiceLocal: "A warm female voice. Audio is generated on this computer and is not stored permanently.",
     hearReply: "Listen to reply",
@@ -208,6 +214,9 @@ export const endoBotCopy = {
     voiceProcessing: "Escuchando y preparando la respuesta…",
     voicePlaying: "Reproduciendo respuesta",
     voiceUnavailable: "El modo de voz no está disponible. Usa el chat de texto.",
+    voiceLoading: "Cargando la voz local. El botón se habilitará cuando esté lista.",
+    voiceStatusUnavailable: "La voz local no está disponible. Comprueba que OmniVoice esté instalado e inicia EndoCare.",
+    microphonePermission: "Permite el acceso al micrófono en la configuración del navegador para hablar con EndoBot.",
     voiceDisclosure: "La respuesta de voz es generada por IA y el audio no se almacena permanentemente.",
     voiceLocal: "Voz femenina cálida. El audio se genera en este equipo y no se almacena permanentemente.",
     hearReply: "Escuchar respuesta",
@@ -261,6 +270,7 @@ export function EndoBotPanel() {
   const [humanReviewConsent, setHumanReviewConsent] = useState(true);
   const [hasNewMessages, setHasNewMessages] = useState(false);
   const [serviceStatus, setServiceStatus] = useState<"checking" | "available" | "unavailable">("checking");
+  const [voiceServiceStatus, setVoiceServiceStatus] = useState<"checking" | "loading" | "ready" | "unavailable">("checking");
   const [voiceState, setVoiceState] = useState<"idle" | "recording" | "processing" | "playing">("idle");
   const [readReplies, setReadReplies] = useState(false);
   const [speakingMessage, setSpeakingMessage] = useState<string | null>(null);
@@ -370,6 +380,29 @@ export function EndoBotPanel() {
     window.addEventListener("online", online);
     window.addEventListener("focus", online);
     return () => { active = false; availabilityCheckRef.current = null; window.clearInterval(refresh); window.removeEventListener("offline", offline); window.removeEventListener("online", online); window.removeEventListener("focus", online); };
+  }, []);
+
+  useEffect(() => {
+    let active = true;
+    const checkVoiceAvailability = async () => {
+      if (!navigator.onLine) { if (active) setVoiceServiceStatus("unavailable"); return; }
+      try {
+        const response = await fetch(`${apiBase}/api/endobot-voice`, { method: "GET", cache: "no-store", signal: AbortSignal.timeout(5000) });
+        const result = await response.json().catch(() => null) as { status?: string; asr?: string; tts?: string } | null;
+        if (!active) return;
+        setVoiceServiceStatus(response.ok && result?.status === "ready" && result.asr === "ready" && result.tts === "ready"
+          ? "ready"
+          : result?.status === "loading" ? "loading" : "unavailable");
+      } catch { if (active) setVoiceServiceStatus("unavailable"); }
+    };
+    void checkVoiceAvailability();
+    const refresh = window.setInterval(() => void checkVoiceAvailability(), 10_000);
+    const offline = () => setVoiceServiceStatus("unavailable");
+    const online = () => void checkVoiceAvailability();
+    window.addEventListener("offline", offline);
+    window.addEventListener("online", online);
+    window.addEventListener("focus", online);
+    return () => { active = false; window.clearInterval(refresh); window.removeEventListener("offline", offline); window.removeEventListener("online", online); window.removeEventListener("focus", online); };
   }, []);
 
   const visibleConversations = useMemo(() => archiveFilter === "all" ? conversations : conversations.filter((item) => item.category === archiveFilter), [archiveFilter, conversations]);
@@ -695,9 +728,12 @@ export function EndoBotPanel() {
       setVoiceState("recording");
       setNotice("");
       recordingTimerRef.current = window.setTimeout(() => { if (recordingSessionRef.current === recordingSession && recorder.state === "recording") recorder.stop(); }, 20_000);
-    } catch {
+    } catch (error) {
       stream?.getTracks().forEach((track) => track.stop());
-      if (recordingSessionRef.current === recordingSession) { setVoiceState("idle"); setNotice(t.voiceUnavailable); }
+      if (recordingSessionRef.current === recordingSession) {
+        setVoiceState("idle");
+        setNotice(error instanceof DOMException && (error.name === "NotAllowedError" || error.name === "PermissionDeniedError") ? t.microphonePermission : t.voiceUnavailable);
+      }
     }
   }
 
@@ -782,7 +818,7 @@ export function EndoBotPanel() {
           <div className="chat-history" ref={chatHistoryRef} onScroll={handleHistoryScroll}>{messages.map((message, index) => {
             const key = message.id ?? `${message.role}-${index}`;
             const isSpeaking = speakingMessage === key;
-            return <div key={key} className={`chat-message ${message.role}`}><span>{message.role === "assistant" ? "EndoBot" : message.role === "human" ? t.humanTeam : t.user}</span><p>{message.content}</p>{message.role === "assistant" && (index > 0 || activeConversationId) ? <button type="button" className="chat-speak" onClick={() => isSpeaking ? stopVoicePlayback() : void speakReply(message.content, key)} aria-label={isSpeaking ? t.stopAudio : t.hearReply}>{isSpeaking ? <Square size={13} /> : <Volume2 size={13} />}{isSpeaking ? (voiceState === "processing" ? t.preparingAudio : t.stopAudio) : t.hearReply}</button> : null}</div>;
+            return <div key={key} className={`chat-message ${message.role}`}><span>{message.role === "assistant" ? "EndoBot" : message.role === "human" ? t.humanTeam : t.user}</span><p>{message.content}</p>{message.role === "assistant" && (index > 0 || activeConversationId) ? <button type="button" className="chat-speak" disabled={voiceServiceStatus !== "ready" && !isSpeaking} onClick={() => isSpeaking ? stopVoicePlayback() : void speakReply(message.content, key)} aria-label={isSpeaking ? t.stopAudio : t.hearReply}>{isSpeaking ? <Square size={13} /> : <Volume2 size={13} />}{isSpeaking ? (voiceState === "processing" ? t.preparingAudio : t.stopAudio) : t.hearReply}</button> : null}</div>;
           })}</div>
           {hasNewMessages ? <button type="button" className="chat-jump" onClick={scrollToLatest}>{t.jumpToLatest}</button> : null}
           {humanTakeoverPaused ? <p className="chat-notice chat-notice-human-takeover" role="status">{t.humanTeamTakenOver}</p> : serviceStatus === "unavailable" ? <div className="chat-notice chat-notice-unavailable" role="status"><p>{t.serviceUnavailable}</p><button type="button" className="voice-button" onClick={() => void availabilityCheckRef.current?.()}>{t.retryAvailability}</button></div> : null}
@@ -793,7 +829,7 @@ export function EndoBotPanel() {
             {!messages.some((message) => message.role === "user") ? <div className="endobot-suggestions" aria-label={t.suggestionsLabel}><span>{t.suggestionsLabel}</span><div>{t.suggestions.map((question) => <button key={question} type="button" onClick={() => useSuggestedQuestion(question)} disabled={serviceStatus === "unavailable" && !humanTakeoverPaused}>{question}</button>)}</div></div> : null}
             <textarea ref={composerRef} id="endobot-message" value={draft} onChange={(event) => setDraft(event.target.value)} onKeyDown={handleMessageComposerKeyDown} maxLength={700} autoComplete="off" spellCheck placeholder={t.placeholder} disabled={authLoading || (serviceStatus === "unavailable" && !humanTakeoverPaused)} />
             <button type="button" className="voice-preference" aria-pressed={readReplies} onClick={() => setReadReplies((current) => !current)}><Volume2 size={13} />{readReplies ? t.readRepliesOn : t.readRepliesOff}</button>
-            <div className="chat-actions"><small>{t.privacyReminder}<br />{t.enterHint}<br />{t.voiceLocal}</small><div className="chat-action-buttons"><button className="voice-button" type="button" onClick={handleVoiceButton} disabled={voiceState === "idle" && (authLoading || pending || (serviceStatus === "unavailable" && !humanTakeoverPaused))} aria-label={voiceState === "recording" ? t.voiceStop : voiceState === "playing" || voiceState === "processing" ? t.stopAudio : t.voiceStart}>{voiceState === "recording" ? <Square size={15} /> : voiceState === "playing" || voiceState === "processing" ? <Square size={15} /> : <Mic size={15} />} {voiceState === "recording" ? t.voiceStop : voiceState === "processing" ? t.preparingAudio : voiceState === "playing" ? t.stopAudio : t.voiceStart}</button><button className="primary-button" type="submit" disabled={authLoading || !draft.trim() || pending || (serviceStatus === "unavailable" && !humanTakeoverPaused)}>{pending ? t.answering : <><Send size={15} /> {t.send}</>}</button></div></div>
+            <div className="chat-actions"><small aria-live="polite">{t.privacyReminder}<br />{t.enterHint}<br />{voiceServiceStatus === "ready" ? t.voiceLocal : voiceServiceStatus === "loading" || voiceServiceStatus === "checking" ? t.voiceLoading : t.voiceStatusUnavailable}</small><div className="chat-action-buttons"><button className="voice-button" type="button" onClick={handleVoiceButton} disabled={voiceState === "idle" && (voiceServiceStatus !== "ready" || authLoading || pending || (serviceStatus === "unavailable" && !humanTakeoverPaused))} aria-label={voiceState === "recording" ? t.voiceStop : voiceState === "playing" || voiceState === "processing" ? t.stopAudio : t.voiceStart}>{voiceState === "recording" ? <Square size={15} /> : voiceState === "playing" || voiceState === "processing" ? <Square size={15} /> : <Mic size={15} />} {voiceState === "recording" ? t.voiceStop : voiceState === "processing" ? t.preparingAudio : voiceState === "playing" ? t.stopAudio : t.voiceStart}</button><button className="primary-button" type="submit" disabled={authLoading || !draft.trim() || pending || (serviceStatus === "unavailable" && !humanTakeoverPaused)}>{pending ? t.answering : <><Send size={15} /> {t.send}</>}</button></div></div>
           </form>}
         </div>
       </div>
