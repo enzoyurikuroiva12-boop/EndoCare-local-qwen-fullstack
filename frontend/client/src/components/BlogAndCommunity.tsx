@@ -5,11 +5,12 @@ import { useAuth } from "@/_core/hooks/useAuth";
 import { startLogin } from "@/const";
 import { useSiteLanguage } from "@/contexts/SiteLanguageContext";
 import { supabase } from "@/lib/supabase";
+import { resolveBrowserApiBaseUrl } from "@/lib/apiBase";
 import { useAccountControl } from "@/contexts/AccountControlContext";
 import { blocksRestrictedFeatures } from "@/lib/accountControl";
 import "./BlogAndCommunity.css";
 
-const apiBase = import.meta.env.VITE_API_BASE_URL || "https://backendendoacolhe.vercel.app";
+const apiBase = resolveBrowserApiBaseUrl(import.meta.env.VITE_API_BASE_URL);
 
 type Story = { id: string; author_alias: string; content: string; helpfulness: number };
 

@@ -7,6 +7,7 @@ import QuestionnaireAdmin from "@/components/QuestionnaireAdmin";
 import { PasswordInput } from "@/components/PasswordInput";
 import { PasswordStrengthMeter } from "@/components/PasswordStrengthMeter";
 import { SiteCopyright } from "@/components/SiteCopyright";
+import { resolveBrowserApiBaseUrl } from "@/lib/apiBase";
 import { Activity, ArrowLeft, Ban, BookOpenCheck, Check, CheckCircle2, ChevronRight, ClipboardCheck, ClipboardList, Eraser, FilePlus2, Hammer, Headphones, History, KeyRound, LockKeyhole, MessagesSquare, Pencil, Pin, PinOff, Power, RefreshCw, RotateCcw, Search, Send, ShieldAlert, ShieldCheck, Timer, Trash2, UserRoundX, Users, X } from "lucide-react";
 import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { useAuth } from "@/_core/hooks/useAuth";
@@ -23,7 +24,7 @@ import "./AdminContentDeletion.css";
 import "./AdminPasswordReset.css";
 import "./AdminAccountControls.css";
 
-const apiBase = import.meta.env.VITE_API_BASE_URL || "https://backendendoacolhe.vercel.app";
+const apiBase = resolveBrowserApiBaseUrl(import.meta.env.VITE_API_BASE_URL);
 
 type ManagedStory = { id: string; author_alias: string; content: string; helpfulness: number; created_at: string; status: "pending" | "approved" | "rejected"; triage_status: "adequate" | "needs_review" | "likely_spam"; triage_confidence: number | null; triage_signals: string[] };
 type ManagedPost = { id: string; category: string; title: string; summary: string; content: string; status: "draft" | "published"; published_at: string | null; updated_at: string; is_pinned: boolean };

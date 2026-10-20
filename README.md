@@ -28,6 +28,14 @@ O pnpm é instalado ou reparado pelos instaladores .bat. Não é necessário ins
 
 Para instalar a voz, instale Python 3.12 e uv, depois execute INSTALAR_VOZ_OMNIVOICE.bat. Ela é opcional: o chat de texto funciona sem esse serviço.
 
+## Acesso por outro computador com Ngrok
+
+1. Instale o Ngrok para Windows em https://ngrok.com/download/windows e configure seu token uma vez no terminal com `ngrok config add-authtoken SEU_TOKEN`. O token fica na configuração local do Ngrok; não o coloque no GitHub.
+2. Execute `INICIAR_ENDOCARE_NGROK.bat`. O script inicia ou reutiliza o EndoCare local e abre um túnel HTTPS para o frontend, encaminhando a API ao backend local.
+3. No outro computador, abra o endereço HTTPS mostrado no terminal e entre com o usuário `EndoCare` e a senha temporária exibida ali.
+
+No primeiro acesso, o Ngrok pode mostrar uma tela informativa; confirme que deseja continuar e depois informe as credenciais do EndoCare. Mantenha a janela do terminal aberta durante o acesso. `Ctrl+C` ou `ENCERRAR_ENDOCARE.bat` encerra o túnel e os serviços locais. A próxima execução gera uma senha nova. Compartilhe o endereço e a senha apenas com quem deve acessar o ambiente. [Sobre o aviso do Ngrok](https://ngrok.com/abuse#browser-warning).
+
 ## Configuração local
 
 Os arquivos .env não fazem parte do repositório. Não publique nem compartilhe esses arquivos. A chave SUPABASE_SERVICE_ROLE_KEY deve existir apenas em backend/.env no computador local e nunca no frontend. Os arquivos .env.example contêm somente marcadores fictícios.

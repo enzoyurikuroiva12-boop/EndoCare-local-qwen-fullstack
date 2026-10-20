@@ -1,4 +1,5 @@
 import { supabase } from "@/lib/supabase";
+import { resolveBrowserApiBaseUrl } from "@/lib/apiBase";
 
 const monitoredPaths = ["/", "/diario", "/blog"] as const;
 const monitoredEventTypes = ["page_view", "engaged_15s", "scroll_50", "scroll_90", "runtime_error"] as const;
@@ -6,7 +7,7 @@ const monitoredEventTypes = ["page_view", "engaged_15s", "scroll_50", "scroll_90
 export type MonitoredPath = (typeof monitoredPaths)[number];
 export type MonitoredEventType = (typeof monitoredEventTypes)[number];
 
-const backendUrl = import.meta.env.VITE_API_BASE_URL || "https://backendendoacolhe.vercel.app";
+const backendUrl = resolveBrowserApiBaseUrl(import.meta.env.VITE_API_BASE_URL);
 const sessionStorageKey = "endoacolhe-site-monitoring-session";
 const viewedRoutesStorageKey = "endoacolhe-site-monitoring-viewed-routes";
 

@@ -209,6 +209,33 @@ foreach ($listener in $listeners) {
     }
 }
 
+# O iniciador do tunel registra identidades de processo. So esses PIDs com
+# executavel, linha de comando e horario de criacao correspondentes podem ser
+# encerrados; outros agentes Ngrok do usuario permanecem ativos.
+$ngrokStatePath = Join-Path $frontendRepository '.local-run\ngrok-process.json'
+if (Test-Path -LiteralPath $ngrokStatePath) {
+    try {
+        $ngrokState = Get-Content -LiteralPath $ngrokStatePath -Raw | ConvertFrom-Json
+        $ngrokCreationUtc = [DateTimeOffset]::Parse([string]$ngrokState.ngrokCreationDateUtc, [Globalization.CultureInfo]::InvariantCulture).UtcDateTime
+        $ngrokProcess = $processById[[int]$ngrokState.ngrokPid]
+        if ($ngrokProcess -and $ngrokProcess.Name -eq 'ngrok.exe' -and
+            $ngrokProcess.ExecutablePath -eq $ngrokState.ngrokExecutablePath -and
+            $ngrokProcess.CreationDate.ToUniversalTime() -eq $ngrokCreationUtc -and
+            $ngrokProcess.CommandLine -match "(?i)\bhttp\s+$([int]$ngrokState.localPort)(?:\s|$)") {
+            Add-ProcessTree -ProcessId ([int]$ngrokProcess.ProcessId) -Service 'Ngrok EndoCare'
+        }
+
+        $guardCreationUtc = [DateTimeOffset]::Parse([string]$ngrokState.guardCreationDateUtc, [Globalization.CultureInfo]::InvariantCulture).UtcDateTime
+        $guardProcess = $processById[[int]$ngrokState.guardPid]
+        if ($guardProcess -and $guardProcess.Name -eq 'node.exe' -and
+            $guardProcess.ExecutablePath -eq $ngrokState.guardExecutablePath -and
+            $guardProcess.CreationDate.ToUniversalTime() -eq $guardCreationUtc -and
+            (Test-CommandPath $guardProcess.CommandLine ([string]$ngrokState.guardScriptPath))) {
+            Add-ProcessTree -ProcessId ([int]$guardProcess.ProcessId) -Service 'Protecao Ngrok EndoCare'
+        }
+    } catch { Write-Verbose 'Registro do Ngrok antigo ou invalido foi ignorado.' }
+}
+
 if ($targets.Count -eq 0) {
     Write-Host 'Nenhum servico local do EndoCare esta em execucao.'
     exit 0
@@ -278,7 +305,7 @@ if (-not $WhatIfPreference) {
         }
     }
     if ($failures -gt 0) { exit 1 }
-    Write-Host 'EndoCare encerrado. Frontend, backend, OmniVoice e Ollama identificados foram parados.'
+    Write-Host 'EndoCare encerrado. Frontend, backend, OmniVoice, Ollama e tunel Ngrok identificados foram parados.'
 } else {
     Write-Host 'Simulacao concluida: nenhum processo foi encerrado.'
 }

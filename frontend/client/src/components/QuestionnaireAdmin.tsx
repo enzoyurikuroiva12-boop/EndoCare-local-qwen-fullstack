@@ -6,10 +6,11 @@ import { toast } from "sonner";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { useSiteLanguage } from "@/contexts/SiteLanguageContext";
 import { supabase } from "@/lib/supabase";
+import { resolveBrowserApiBaseUrl } from "@/lib/apiBase";
 import type { QuestionnaireQuestion } from "./Questionnaire";
 import "./QuestionnaireAdmin.css";
 
-const apiBase = import.meta.env.VITE_API_BASE_URL || "https://backendendoacolhe.vercel.app";
+const apiBase = resolveBrowserApiBaseUrl(import.meta.env.VITE_API_BASE_URL);
 
 type QuestionForm = {
   prompt_pt: string;

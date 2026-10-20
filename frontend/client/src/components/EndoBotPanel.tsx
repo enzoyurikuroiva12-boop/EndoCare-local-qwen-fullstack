@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Bot, FolderOpen, Globe2, LockKeyhole, MessageCirclePlus, Mic, Send, ShieldAlert, Sparkles, Square, Trash2, Volume2 } from "lucide-react";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { supabase } from "@/lib/supabase";
+import { resolveBrowserApiBaseUrl } from "@/lib/apiBase";
 import { botLanguages, initialBotMessage, type BotLanguage } from "@/lib/endoBotLanguage";
 import { isNearChatBottom } from "@/lib/chatScroll";
 import { handleMessageComposerKeyDown } from "@/lib/messageComposer";
@@ -17,7 +18,7 @@ type Conversation = { id: string; category: string; language: BotLanguage; title
 
 const categories = ["Informações gerais", "Sintomas", "Perguntas para consulta", "Organização pessoal"] as const;
 type Category = typeof categories[number];
-const apiBase = import.meta.env.VITE_API_BASE_URL || "https://backendendoacolhe.vercel.app";
+const apiBase = resolveBrowserApiBaseUrl(import.meta.env.VITE_API_BASE_URL);
 
 export function createTemporaryMessages(language: BotLanguage): ChatMessage[] {
   return [initialBotMessage(language)];
