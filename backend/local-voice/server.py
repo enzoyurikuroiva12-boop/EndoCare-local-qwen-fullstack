@@ -30,8 +30,8 @@ HERE = Path(__file__).resolve().parent
 MODEL_CACHE = HERE / "models"
 OMNI_MODEL = "k2-fsa/OmniVoice"
 OMNI_REVISION = "c5fdb5ccb189668d56333f77ba2629f4cd7535f4"
-WHISPER_MODEL = "Systran/faster-whisper-base"
-WHISPER_REVISION = "ebe41f70d5b6dfa9166e2c581c45c9c0cfc57b66"
+WHISPER_MODEL = "Systran/faster-whisper-small"
+WHISPER_REVISION = "536b0662742c02347bc0e980a01041f333bce120"
 MAX_AUDIO_BYTES = 8 * 1024 * 1024
 MAX_AUDIO_SECONDS = 65
 MAX_CPU_TEXT_CHARS = 300
@@ -202,15 +202,23 @@ def generate_speech(text: str, language: str = "pt"):
                 )[0]
         try:
             audio = run_generation()
-        except torch.cuda.OutOfMemoryError:
+        except (torch.cuda.OutOfMemoryError, torch.AcceleratorError) as accelerator_error:
             if os.getenv("OMNIVOICE_DEVICE", "auto").lower() != "auto":
                 raise
-            logger.warning("GPU memory changed; moving OmniVoice to CPU and retrying")
-            tts_model.to("cpu").float()
-            torch.cuda.empty_cache()
+            logger.warning("OmniVoice GPU generation failed (%s); moving to CPU and retrying", type(accelerator_error).__name__)
+            try:
+                tts_model.to("cpu").float()
+            except Exception as fallback_error:
+                logger.error("OmniVoice CPU recovery failed (%s)", type(fallback_error).__name__)
+                raise HTTPException(503, "A voz local falhou na GPU. Reinicie o EndoCare e tente novamente.") from fallback_error
+            try:
+                if torch.cuda.is_initialized():
+                    torch.cuda.empty_cache()
+            except Exception:
+                logger.warning("CUDA cache cleanup failed after moving OmniVoice to CPU")
             state.update(device="cpu", decoderDevice="cpu")
             apply_runtime_profile()
-            if len(text) > int(state["maxTextChars"]):
+            if len(spoken) > int(state["maxTextChars"]):
                 raise HTTPException(413, CPU_TEXT_LIMIT_MESSAGE)
             audio = run_generation()
         output = io.BytesIO()
@@ -261,7 +269,8 @@ def transcribe_audio(audio: bytes):
         if len(decoded) == 0:
             raise HTTPException(422, "A gravação está vazia.")
         segments, _ = asr_model.transcribe(
-            decoded, language="pt", beam_size=3, vad_filter=True,
+            decoded, language="pt", beam_size=5, vad_filter=True,
+            vad_parameters={"min_silence_duration_ms": 500, "speech_pad_ms": 300},
             condition_on_previous_text=False,
         )
         return " ".join(segment.text.strip() for segment in segments).strip()

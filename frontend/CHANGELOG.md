@@ -1743,3 +1743,17 @@ Ao adicionar uma mudança relevante ao frontend, inclua uma entrada com a data, 
 ## 2026-10-08 — Backup local com Qwen/Ollama
 
 Foi criado um backup independente do frontend EndoCare para execução local com o backend `backend2-local-qwen-backup`. A URL da API agora pode ser definida por `VITE_API_BASE_URL`, permitindo usar `http://127.0.0.1:3000` sem alterar a versão publicada. Foram adicionados modelos de ambiente, scripts Windows de instalação/inicialização, documentação do Cloudflare Pages e instruções de privacidade.
+
+## 2026-10-20 — Recuperação da voz e transcrição mais precisa
+
+### Corrigido
+
+- A síntese do OmniVoice agora tenta novamente em CPU quando a GPU apresenta erro do acelerador CUDA em modo automático, além do fallback que já existia para falta de memória. Na CPU, permanece o limite de 300 caracteres para evitar sínteses longas que não terminam dentro do prazo.
+- A gravação do navegador solicita cancelamento de eco, redução de ruído, ganho automático e um canal de áudio, melhorando a captura de perguntas curtas.
+- O reconhecimento local mudou do Whisper base para Whisper small, aumentou `beam_size` de 3 para 5 e ajustou o VAD para preservar pausas e as bordas das frases curtas.
+- A reprodução desbloqueia o Web Audio durante o clique ou início da gravação, para que a espera pela síntese não perca a autorização temporária de áudio do navegador; o elemento de áudio continua como alternativa.
+
+### Validado
+
+- Teste local gerou um WAV OmniVoice válido de 24 kHz e 3 segundos. O Whisper small reconheceu uma amostra sintetizada de “Teste, está me ouvindo?” como “Teste está me ouvindo.”
+- Testes locais do serviço de voz, type-check, build e teste do componente do EndoBot aprovados. A suíte do backend passou com **91 testes**; **2 testes opcionais de fault injection** foram pulados por dependerem de um proxy local.

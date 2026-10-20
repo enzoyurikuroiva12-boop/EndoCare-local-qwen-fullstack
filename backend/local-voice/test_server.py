@@ -55,6 +55,29 @@ class RuntimeLimits(TestCase):
         self.assertFalse(server.generation_lock.locked())
         self.assertEqual(empty_cache.call_count, 2)
 
+    @patch("server.torch.set_num_threads")
+    @patch("server.torch.cuda.empty_cache")
+    @patch("server.torch.cuda.is_initialized", return_value=True)
+    def test_cuda_accelerator_error_retries_short_speech_on_cpu(self, is_initialized, empty_cache, set_threads):
+        model = MagicMock()
+        model.generate.side_effect = [
+            server.torch.AcceleratorError("simulated GPU failure"),
+            [server.np.zeros(800, dtype=server.np.float32)],
+        ]
+        model.to.return_value = model
+        model.float.return_value = model
+        model.sampling_rate = 24_000
+        server.tts_model = model
+        server.state.update(tts="ready", device="cuda:0", maxTextChars=6000)
+        with patch.dict("server.os.environ", {"OMNIVOICE_DEVICE": "auto"}):
+            audio = server.generate_speech("Olá, estou ouvindo você.")
+        self.assertEqual(audio[:4], b"RIFF")
+        self.assertEqual(model.generate.call_count, 2)
+        self.assertEqual(model.to.call_args.args, ("cpu",))
+        self.assertEqual(server.state["device"], "cpu")
+        self.assertFalse(server.generation_lock.locked())
+        self.assertEqual(empty_cache.call_count, 2)
+
 
 if __name__ == "__main__":
     main()

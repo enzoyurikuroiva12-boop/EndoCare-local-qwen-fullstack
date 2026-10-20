@@ -280,6 +280,8 @@ export function EndoBotPanel() {
   const recorderRef = useRef<MediaRecorder | null>(null);
   const recordedChunksRef = useRef<Blob[]>([]);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const audioSourceRef = useRef<AudioBufferSourceNode | null>(null);
   const audioUrlRef = useRef<string | null>(null);
   const followLatestRef = useRef(true);
   const availabilityCheckRef = useRef<(() => Promise<void>) | null>(null);
@@ -305,6 +307,13 @@ export function EndoBotPanel() {
       recorder.stream.getTracks().forEach((track) => track.stop());
     }
     audioRef.current?.pause();
+    if (audioSourceRef.current) {
+      audioSourceRef.current.onended = null;
+      try { audioSourceRef.current.stop(); } catch { /* The source may already have ended. */ }
+      audioSourceRef.current.disconnect();
+    }
+    audioSourceRef.current = null;
+    void audioContextRef.current?.close();
     voiceRequestRef.current?.abort();
     voiceFlowRequestRef.current?.abort();
     textRequestRef.current?.abort();
@@ -635,6 +644,12 @@ export function EndoBotPanel() {
     voiceRequestRef.current = null;
     audioRef.current?.pause();
     audioRef.current = null;
+    if (audioSourceRef.current) {
+      audioSourceRef.current.onended = null;
+      try { audioSourceRef.current.stop(); } catch { /* The source may already have ended. */ }
+      audioSourceRef.current.disconnect();
+    }
+    audioSourceRef.current = null;
     if (audioUrlRef.current) URL.revokeObjectURL(audioUrlRef.current);
     audioUrlRef.current = null;
     setVoiceState("idle");
@@ -656,10 +671,55 @@ export function EndoBotPanel() {
     setVoiceState("idle");
   }
 
+  async function unlockAudioPlayback() {
+    if (typeof window.AudioContext !== "function") return false;
+    let context = audioContextRef.current;
+    if (!context || context.state === "closed") {
+      context = new window.AudioContext();
+      audioContextRef.current = context;
+    }
+    if (context.state !== "running") await context.resume();
+    return context.state === "running";
+  }
+
   async function playVoiceAudio(audioBase64: string, audioMimeType: string) {
     audioRef.current?.pause();
+    if (audioSourceRef.current) {
+      audioSourceRef.current.onended = null;
+      try { audioSourceRef.current.stop(); } catch { /* The source may already have ended. */ }
+      audioSourceRef.current.disconnect();
+      audioSourceRef.current = null;
+    }
     if (audioUrlRef.current) URL.revokeObjectURL(audioUrlRef.current);
-    const audioUrl = URL.createObjectURL(new Blob([Uint8Array.from(atob(audioBase64), (char) => char.charCodeAt(0))], { type: audioMimeType }));
+    const bytes = Uint8Array.from(atob(audioBase64), (char) => char.charCodeAt(0));
+    const context = audioContextRef.current;
+    if (context) {
+      try {
+        if (context.state !== "running") await context.resume();
+        if (context.state === "running") {
+          const data = bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength);
+          const decoded = await context.decodeAudioData(data);
+          if (context.state !== "running") await context.resume();
+          const source = context.createBufferSource();
+          source.buffer = decoded;
+          source.connect(context.destination);
+          source.onended = () => {
+            if (audioSourceRef.current === source) {
+              audioSourceRef.current = null;
+              setVoiceState("idle");
+              setSpeakingMessage(null);
+            }
+          };
+          audioSourceRef.current = source;
+          setVoiceState("playing");
+          source.start();
+          return;
+        }
+      } catch (error) {
+        if (error instanceof DOMException && error.name === "NotAllowedError") throw error;
+      }
+    }
+    const audioUrl = URL.createObjectURL(new Blob([bytes], { type: audioMimeType }));
     audioUrlRef.current = audioUrl;
     const player = new Audio(audioUrl);
     audioRef.current = player;
@@ -670,6 +730,7 @@ export function EndoBotPanel() {
   }
 
   async function speakReply(text: string, key: string) {
+    const audioUnlocked = unlockAudioPlayback().catch(() => false);
     cancelVoiceRecording();
     cancelVoiceFlow();
     stopVoicePlayback();
@@ -691,6 +752,7 @@ export function EndoBotPanel() {
         voiceAudioCacheRef.current = { text, language, ...result };
       }
       if (controller.signal.aborted) return;
+      await audioUnlocked;
       await playVoiceAudio(result.audioBase64, result.audioMimeType || "audio/wav");
     } catch (error) {
       if (controller.signal.aborted) return;
@@ -704,11 +766,12 @@ export function EndoBotPanel() {
     if (authLoading || voiceState !== "idle" || pending || (serviceStatus === "unavailable" && !humanTakeoverPaused)) return;
     if (!navigator.mediaDevices?.getUserMedia || !window.MediaRecorder) return setNotice(t.voiceUnavailable);
     if (isAuthenticated && blocksRestrictedFeatures(control)) return setNotice(t.restricted);
+    void unlockAudioPlayback().catch(() => false);
     const recordingSession = ++recordingSessionRef.current;
     let stream: MediaStream | undefined;
     setVoiceState("recording");
     try {
-      stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true, channelCount: 1 } });
       if (recordingSessionRef.current !== recordingSession) { stream.getTracks().forEach((track) => track.stop()); return; }
       const mimeType = ["audio/webm;codecs=opus", "audio/webm", "audio/mp4", "audio/ogg"].find((item) => MediaRecorder.isTypeSupported(item)) ?? "audio/webm";
       const recorder = new MediaRecorder(stream, { mimeType });
@@ -829,7 +892,7 @@ export function EndoBotPanel() {
             <label htmlFor="endobot-message">{t.question}</label>
             {!messages.some((message) => message.role === "user") ? <div className="endobot-suggestions" aria-label={t.suggestionsLabel}><span>{t.suggestionsLabel}</span><div>{t.suggestions.map((question) => <button key={question} type="button" onClick={() => useSuggestedQuestion(question)} disabled={serviceStatus === "unavailable" && !humanTakeoverPaused}>{question}</button>)}</div></div> : null}
             <textarea ref={composerRef} id="endobot-message" value={draft} onChange={(event) => setDraft(event.target.value)} onKeyDown={handleMessageComposerKeyDown} maxLength={700} autoComplete="off" spellCheck placeholder={t.placeholder} disabled={authLoading || (serviceStatus === "unavailable" && !humanTakeoverPaused)} />
-            <button type="button" className="voice-preference" aria-pressed={readReplies} onClick={() => setReadReplies((current) => !current)}><Volume2 size={13} />{readReplies ? t.readRepliesOn : t.readRepliesOff}</button>
+            <button type="button" className="voice-preference" aria-pressed={readReplies} onClick={() => { void unlockAudioPlayback().catch(() => false); setReadReplies((current) => !current); }}><Volume2 size={13} />{readReplies ? t.readRepliesOn : t.readRepliesOff}</button>
             <div className="chat-actions"><small aria-live="polite">{t.privacyReminder}<br />{t.enterHint}<br />{voiceServiceStatus === "ready" ? t.voiceLocal : voiceServiceStatus === "loading" || voiceServiceStatus === "checking" ? t.voiceLoading : t.voiceStatusUnavailable}</small><div className="chat-action-buttons"><button className="voice-button" type="button" onClick={handleVoiceButton} disabled={voiceState === "idle" && (voiceServiceStatus !== "ready" || authLoading || pending || (serviceStatus === "unavailable" && !humanTakeoverPaused))} aria-label={voiceState === "recording" ? t.voiceStop : voiceState === "playing" || voiceState === "processing" ? t.stopAudio : t.voiceStart}>{voiceState === "recording" ? <Square size={15} /> : voiceState === "playing" || voiceState === "processing" ? <Square size={15} /> : <Mic size={15} />} {voiceState === "recording" ? t.voiceStop : voiceState === "processing" ? t.preparingAudio : voiceState === "playing" ? t.stopAudio : t.voiceStart}</button><button className="primary-button" type="submit" disabled={authLoading || !draft.trim() || pending || (serviceStatus === "unavailable" && !humanTakeoverPaused)}>{pending ? t.answering : <><Send size={15} /> {t.send}</>}</button></div></div>
           </form>}
         </div>
