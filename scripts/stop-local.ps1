@@ -116,10 +116,16 @@ foreach ($repository in $backendRepositories) {
     $hasOllamaState = $true
     try {
         $state = Get-Content -LiteralPath $statePath -Raw | ConvertFrom-Json
+        $registeredCreationUtc = $state.creationDateUtc
+        if ($registeredCreationUtc -is [DateTime]) {
+            $registeredCreationUtc = $registeredCreationUtc.ToUniversalTime()
+        } else {
+            $registeredCreationUtc = [DateTimeOffset]::Parse([string]$registeredCreationUtc, [Globalization.CultureInfo]::InvariantCulture).UtcDateTime
+        }
         $process = $processById[[int]$state.pid]
         if (-not (Test-OllamaServe $process) -or $state.host -ne '127.0.0.1:11434' -or
             $process.ExecutablePath -ne $state.executablePath -or
-            $process.CreationDate.ToUniversalTime() -ne ([DateTimeOffset]::Parse($state.creationDateUtc)).UtcDateTime) { continue }
+            $process.CreationDate.ToUniversalTime() -ne $registeredCreationUtc) { continue }
         $otherPort = $allListeners | Where-Object { $_.OwningProcess -eq $state.pid -and $_.LocalPort -ne 11434 }
         if (-not $otherPort) { Add-ProcessTree -ProcessId ([int]$state.pid) -Service 'Ollama local' }
     } catch { Write-Verbose 'Registro antigo de Ollama ignorado.' }
