@@ -3,10 +3,10 @@ $taskVoiceRoot = $PSScriptRoot
 $taskPython = Join-Path $taskVoiceRoot '.venv\Scripts\python.exe'
 $taskServer = Join-Path $taskVoiceRoot 'server.py'
 if (-not (Test-Path -LiteralPath $taskPython)) {
-    throw 'OmniVoice ainda nao instalado. Execute INSTALAR_VOZ_OMNIVOICE.bat primeiro.'
+    throw 'OmniVoice ainda nao instalado. Execute BAIXAR_ENDOCARE.bat e aceite a opcao de voz.'
 }
 & $taskPython -c "import importlib.util,sys; sys.exit(0 if all(importlib.util.find_spec(name) for name in ['torch','omnivoice','fastapi','faster_whisper']) else 1)"
-if ($LASTEXITCODE -ne 0) { throw 'A instalacao da voz esta incompleta. Execute INSTALAR_VOZ_OMNIVOICE.bat.' }
+if ($LASTEXITCODE -ne 0) { throw 'A instalacao da voz esta incompleta. Execute BAIXAR_ENDOCARE.bat e aceite a opcao de voz.' }
 $taskListener = Get-NetTCPConnection -LocalPort 7862 -State Listen -ErrorAction SilentlyContinue
 if ($taskListener) {
     try { $taskHealth = Invoke-RestMethod -Uri 'http://127.0.0.1:7862/health' -TimeoutSec 5 }

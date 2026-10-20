@@ -106,7 +106,7 @@ try {
     $taskNode = (Get-Command node.exe -ErrorAction Stop).Source
     $taskPowerShell = (Get-Command powershell.exe -ErrorAction Stop).Source
     if (-not (Test-Path -LiteralPath (Join-Path $taskFrontendDirectory '.env'))) {
-        throw 'Execute INSTALAR_ENDOCARE.bat e configure frontend\.env primeiro.'
+        throw 'Execute BAIXAR_ENDOCARE.bat e configure frontend\.env primeiro.'
     }
     $taskBackendDirectory = Join-Path $taskFrontendRoot 'backend'
     if (-not (Test-Path -LiteralPath (Join-Path $taskBackendDirectory 'scripts\start-local.mjs'))) {
@@ -134,7 +134,7 @@ try {
         Pop-Location
     }
     if (-not (Test-Path -LiteralPath $taskFrontendServer) -or -not $taskTsxAvailable) {
-        throw 'Instale as dependencias com INSTALAR_ENDOCARE.bat e INSTALAR_BACKEND_QWEN.bat primeiro.'
+        throw 'Instale as dependencias com BAIXAR_ENDOCARE.bat primeiro.'
     }
     New-Item -ItemType Directory -Path $taskStateDirectory -Force | Out-Null
     # Confirma o comando de todos os donos das portas antes de reutilizar uma instancia.
@@ -164,7 +164,7 @@ try {
             if ($LASTEXITCODE -ne 0) { throw 'Confira backend\local-voice\stderr.log.' }
         } catch { Write-Warning ("Voz local indisponivel: " + $_.Exception.Message + ' O chat de texto continua pronto.') }
     } else {
-        Write-Host 'Voz opcional: execute INSTALAR_VOZ_OMNIVOICE.bat na pasta do backend para instalar.'
+        Write-Host 'Voz opcional: execute BAIXAR_ENDOCARE.bat e aceite a opcao de voz para instalar.'
     }
     exit 0
 } catch {

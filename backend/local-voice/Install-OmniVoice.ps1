@@ -22,4 +22,4 @@ if ($LASTEXITCODE -ne 0) { throw 'A instalacao do OmniVoice falhou.' }
 Write-Host 'Baixando os modelos oficiais OmniVoice e Whisper (aproximadamente 3.5 GB)...'
 & $taskPython (Join-Path $taskVoiceRoot 'server.py') --download-only
 if ($LASTEXITCODE -ne 0) { throw 'O download dos modelos de voz falhou.' }
-Write-Host 'Voz local instalada. Execute INICIAR_VOZ_OMNIVOICE.bat ou o iniciador do EndoCare.'
+Write-Host 'Voz local instalada. Execute INICIAR_ENDOCARE.bat para iniciar o EndoCare e o OmniVoice.'
