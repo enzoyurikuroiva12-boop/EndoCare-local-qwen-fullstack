@@ -1,74 +1,55 @@
-# Processo de criação do EndoCare
+# Como o EndoCare nasceu
 
-Este documento reúne o que os arquivos Markdown do repositório registram sobre a origem, as decisões, a arquitetura e a evolução do EndoCare. As datas e funcionalidades abaixo vêm principalmente do changelog; os guias técnicos descrevem os fluxos de autenticação, conhecimento do EndoBot, supervisão humana, voz e instalação local.
+Este texto conta primeiro a ideia do projeto em linguagem simples. No final, há seções separadas sobre o que o site oferece, como funciona por dentro e como trata a privacidade.
 
-## Propósito e ponto de partida
+## O que levou a gente a criar o site
 
-O EndoCare foi criado como um site educativo e acolhedor sobre endometriose. A ideia central, conforme registrada no changelog, é ajudar a pessoa a encontrar informação geral, acompanhar sintomas e preparar perguntas para uma consulta, sem apresentar o site como ferramenta de diagnóstico, prescrição ou substituto de atendimento profissional.
+O EndoCare foi criado por alunos do SESI com a vontade de falar sobre endometriose de um jeito claro, respeitoso e acolhedor. A ideia foi reunir informações gerais e recursos úteis em um só lugar para quem convive com a condição, tem dúvidas ou quer se preparar melhor para conversar com profissionais de saúde.
 
-A primeira fundação registrada é de **18 de agosto de 2026**. Ela já reunia uma homepage editorial, navegação por áreas do site, conteúdo sobre fitoterapia, um diário local de sintomas, o EndoBot, um blog e uma área de relatos com consentimento. O aviso de segurança clínica e a orientação para não compartilhar dados pessoais faziam parte dessa base desde o início.
+Além de informar, queríamos oferecer formas práticas de organizar o dia a dia: registrar sintomas, encontrar assuntos para ler e preparar perguntas para uma consulta. O site também busca acolher dúvidas sem fazer a pessoa se sentir julgada ou pressionada a compartilhar informações pessoais.
 
-Os documentos não descrevem entrevistas com pacientes, estudos clínicos próprios ou um processo formal de pesquisa com usuários. Por isso, este histórico relata o que está documentado no repositório e não atribui ao projeto métodos ou validações que os arquivos não comprovam.
+Desde o início, o EndoCare foi pensado como apoio educativo. Ele não foi criado para diagnosticar, indicar tratamentos ou substituir médicos e outros profissionais de saúde.
 
-## Referências e princípios de conteúdo
+## Como a ideia foi tomando forma
 
-O produto foi organizado em torno de informação educativa, acolhimento, acessibilidade, transparência e privacidade. As páginas públicas explicam o propósito do site; o Diário, o Questionário, o EndoBot e a Administração recebem proteções próprias e não são tratados como conteúdo público para indexação.
+O projeto começou com uma página de apresentação e algumas áreas centrais: conteúdo sobre endometriose, diário de sintomas, EndoBot, blog e espaço para relatos. Conforme o site cresceu, foram incluídos recursos para tornar a experiência mais completa, como acesso por conta, versões em português, inglês e espanhol, questionário, páginas de ajuda e informações sobre uso e privacidade.
 
-Em 27 de agosto, o changelog registra uma pesquisa de palavras-chave voltada ao Brasil, organizada em **300 termos e cinco grupos temáticos**. Métricas que a fonte consultada não fornecia — como volume, custo por clique e dificuldade — foram marcadas como não disponíveis, em vez de estimadas. Essa pesquisa orientou caminhos editoriais sobre sintomas, dor pélvica, exames, diagnóstico, tipos de endometriose, fertilidade e vida cotidiana. O conteúdo mantém o aviso de que leitura educativa não substitui consulta, diagnóstico, prescrição ou atendimento de urgência.
+Também foram feitos ajustes para que o site pudesse ser usado em diferentes tamanhos de tela e por mais pessoas. O EndoBot ganhou limites mais claros e a opção de encaminhar uma conversa para a equipe humana nas situações previstas pelo site. Mais tarde, foi acrescentada a possibilidade de conversar por voz.
 
-O EndoBot também tem um acervo interno de referência. O guia de RAG descreve arquivos JSON no Supabase Storage, carregados e divididos em trechos para recuperar somente partes relacionadas à pergunta. Na auditoria registrada em 10 de outubro de 2026, o acervo tinha 19 arquivos e 5.298 registros textuais. Esse número é um retrato daquela auditoria, não uma garantia de que o conteúdo ou a contagem permaneçam iguais. A presença de um acervo não equivale, por si só, a revisão clínica independente de cada resposta.
+Cada etapa procurou manter a mesma intenção: facilitar o acesso a informação, ajudar a pessoa a se organizar e deixar claros os limites do que o site e a inteligência artificial podem fazer.
 
-## Como o site foi construído
+# O que o site oferece
 
-O frontend usa **React 19, TypeScript e Vite**, com estilos em **Tailwind CSS 4**. O código está em `frontend/`. A interface começou com identidade visual própria e foi refinada ao longo dos registros: páginas responsivas, navegação em português, inglês e espanhol, blog em formato editorial, ilustrações botânicas, animações com respeito à preferência por movimento reduzido e recursos de acessibilidade, incluindo integração com VLibras.
+- **Conteúdo informativo:** páginas, vídeos, perguntas frequentes e artigos sobre endometriose.
+- **Diário de sintomas:** espaço pessoal para anotar datas, dores, humor, sangramento, medicamentos e observações.
+- **EndoBot:** conversa para perguntas gerais e para ajudar a organizar dúvidas para uma consulta. Pode receber perguntas faladas e ler respostas em voz alta.
+- **Relatos e questionário:** espaços para compartilhar experiências ou responder às perguntas disponíveis, seguindo os avisos apresentados no site.
+- **Equipe humana:** em conversas elegíveis do EndoBot, a equipe pode assumir o atendimento e responder com identificação humana.
+- **Acessibilidade e idiomas:** interface em português, inglês e espanhol, com recursos de acessibilidade como VLibras e adaptação a telas menores.
+- **Conta e área administrativa:** recursos privados para a pessoa usuária e ferramentas restritas para a equipe responsável pelo site.
 
-O changelog mostra uma evolução em etapas: a fundação das páginas e recursos; a expansão de idiomas, autenticação e Administração; a produção de conteúdo em vídeo, FAQ e documentos legais; e, depois, ajustes de segurança, acessibilidade, responsividade e descoberta pública. O blog, o Diário, o Questionário, o EndoBot e os painéis administrativos foram ganhando fluxos e permissões específicos, em vez de serem expostos como uma única área sem distinção.
+# Parte técnica
 
-O backend está em `backend/`. O projeto usa Node.js e TypeScript, com endpoints para as funções do site. **Há dois modos de IA registrados nos documentos:** o histórico da versão publicada registra uma API implantada na Vercel, com OpenRouter como provedor principal do EndoBot e NVIDIA como alternativa; o modo local descrito no README usa **Qwen 2.5 3B pelo Ollama**, acessível em `127.0.0.1:11434`, com a API local em `127.0.0.1:3000`. O frontend local é servido pelo Vite em `127.0.0.1:5173`. O modo local é iniciado pelos arquivos `.bat` da raiz e não exige chave de API de IA para o Qwen.
+Esta pasta contém uma versão preparada para uso local no Windows. A interface foi construída com React, TypeScript e Vite; a API usa Node.js e TypeScript. O modo local de conversa usa o modelo Qwen 2.5 3B pelo Ollama. O Supabase fornece serviços de conta e dados configurados para a aplicação.
 
-O **Supabase** fornece autenticação e serviços de dados configurados para a aplicação, incluindo Storage para o acervo do EndoBot. As migrações SQL do projeto definem estruturas e regras de acesso. A instalação depende de credenciais locais configuradas conforme os arquivos `.env.example`; os `.env` reais não pertencem ao repositório. A chave `SUPABASE_SERVICE_ROLE_KEY` deve ficar apenas no backend.
+Os arquivos `BAIXAR_ENDOCARE.bat`, `INICIAR_ENDOCARE.bat` e `ENCERRAR_ENDOCARE.bat` ajudam a instalar, abrir e fechar os serviços locais. O Ngrok pode criar um endereço temporário para acessar esse ambiente de outro computador, conforme a configuração da conta.
 
-## Recursos principais e decisões de segurança
+Na voz pt-BR deste computador, o EndoBot usa a voz feminina padrão do Windows, **Microsoft Maria Desktop**. O reconhecimento das gravações usa Whisper local. Se a voz brasileira do Windows não estiver disponível, o serviço pode usar o OmniVoice instalado como alternativa. Os documentos do projeto também registram uma versão publicada em nuvem, cuja infraestrutura e provedores de IA são diferentes do modo local.
 
-- **Conteúdo público:** homepage, Blog, FAQ, Termos de Uso e Política de Privacidade. O sitemap e as descrições de busca incluem as páginas públicas e deixam fora Diário, Questionário, Administração e API.
-- **Diário de sintomas:** permite registrar informações como data, intensidade da dor, humor, sangramento, medicação e notas. O changelog o descreve como diário pessoal; não como diagnóstico automatizado.
-- **Questionário e relatos:** os registros passam por limites e controles administrativos. A triagem automática de relatos ajuda a organizar a revisão, mas não publica, rejeita nem pune automaticamente; decisões de moderação continuam humanas.
-- **Autenticação:** o guia descreve cadastro com e-mail e senha, confirmação de conta por link, recuperação de senha e aceite de Termos e Privacidade. As mensagens de erro são genéricas para não revelar se uma conta existe.
-- **EndoBot e supervisão humana:** mensagens passam por validações no backend; respostas automáticas e humanas têm papéis distintos. A fila humana é protegida por permissões e funções do banco, e a auditoria registra ações sem copiar o conteúdo da conversa.
-- **Privacidade:** consentimento ou aviso de acompanhamento é limitado à conversa e pode ser revogado conforme os fluxos descritos. O changelog registra uma mudança de política em 31 de agosto: o checkbox inicial foi substituído por um aviso visível para novas conversas autenticadas. O guia de supervisão ainda descreve o fluxo anterior de aceite específico; essa diferença entre os documentos deve ser conferida antes de usar o guia como instrução operacional.
+# Privacidade e limites
 
-Essas decisões refletem um princípio repetido nos documentos: proteger conteúdo de saúde, não expor segredos no navegador e deixar claras as limitações da IA. As credenciais ficam no servidor ou em arquivos locais ignorados pelo Git. Os fluxos de supervisão passam por autorização no banco, e respostas indisponíveis retornam mensagens controladas sem expor erros internos.
+- O Diário de sintomas fica salvo no navegador usado pela pessoa; esse recurso não envia as anotações para a conta.
+- Informações de conta e recursos que dependem de login podem ser processados pelo Supabase configurado para o site. O e-mail não aparece publicamente.
+- Conversas autenticadas do EndoBot podem ser vistas pelo responsável do EndoCare quando necessário, conforme o aviso apresentado no próprio site. Respostas humanas aparecem identificadas como equipe.
+- Relatos só devem ser publicados com autorização e passam por revisão antes da publicação.
+- Os arquivos `.env` guardam configurações privadas e não devem ser publicados no GitHub. Não inclua senhas, tokens, dados pessoais ou informações de saúde desnecessárias nas mensagens.
+- O EndoBot pode errar. Suas respostas são informativas e não substituem avaliação, diagnóstico, tratamento ou atendimento de urgência.
 
-## Voz do EndoBot
+## Materiais consultados
 
-O modo de voz foi registrado no changelog em 18 de setembro de 2026. A pessoa pode gravar uma pergunta e ouvir a resposta; a interface informa que a voz é gerada por IA e orienta a não compartilhar dados pessoais.
-
-O guia local descreve **OmniVoice 0.2.1** para síntese em português com perfil feminino, sem clonagem de voz, e **faster-whisper 1.2.1** para reconhecer gravações. Esse serviço opcional roda em `127.0.0.1:7862`. A instalação local exige Python 3.12 e `uv`, além de downloads de modelos e dependências que ocupam aproximadamente 7 GB. O chat escrito continua funcionando sem a instalação de voz.
-
-## Sistema de desenvolvimento e execução
-
-Os guias do repositório descrevem **Node.js 20 ou superior** e **pnpm** para instalar e executar a aplicação. No Windows, os arquivos `.bat` automatizam a instalação, a inicialização e o encerramento do frontend, backend local e, opcionalmente, serviço de voz. O Ollama fornece o modelo Qwen local. Para acessar o ambiente local de outro computador, o README documenta um túnel HTTPS pelo Ngrok, protegido por credenciais temporárias.
-
-As alterações de frontend foram acompanhadas no `CHANGELOG.md` com registros de correções, recursos, segurança e validações. As etapas descritas incluem testes automatizados, checagem de tipos e build. Os arquivos de instalação ajudam a repetir o ambiente, mas o uso real ainda depende das credenciais do Supabase configuradas no computador.
-
-## Linha do tempo registrada
-
-- **18/08/2026:** fundação do frontend, identidade visual inicial, páginas educativas, Diário, EndoBot, Blog e relatos.
-- **19–22/08/2026:** expansão para três idiomas, autenticação, conta, conteúdo em vídeo, acessibilidade, Diário em página própria e ferramentas administrativas.
-- **25–27/08/2026:** consolidação de páginas legais, segurança e permissões administrativas, melhorias no EndoBot e supervisão humana.
-- **28–31/08/2026:** triagem conservadora de relatos, SEO, fallback NVIDIA e atualização das regras de transparência da supervisão.
-- **18/09/2026:** inclusão de gravação e reprodução de voz no EndoBot.
-- **08/10/2026:** registro de uma cópia local com Qwen/Ollama e scripts para execução independente da versão publicada.
-
-## Limites do que este histórico afirma
-
-Este relato foi montado a partir dos seis arquivos Markdown versionados listados abaixo e complementado pela configuração de pacotes para identificar a stack. Ele explica as decisões e os sistemas registrados, mas não certifica o estado atual de serviços externos, credenciais, banco de produção ou implantação. Também não afirma que respostas de IA sejam orientação médica: o EndoCare é um recurso educativo e deve encaminhar dúvidas clínicas à equipe de saúde da pessoa.
-
-## Arquivos consultados
-
-- [README.md](README.md) — instalação, serviços locais, configuração, Ngrok e privacidade.
-- [frontend/CHANGELOG.md](frontend/CHANGELOG.md) — histórico de recursos, correções, decisões e validações.
-- [frontend/CONFIGURAR_AUTENTICACAO.md](frontend/CONFIGURAR_AUTENTICACAO.md) — login, cadastro, confirmação e recuperação de conta.
-- [frontend/ENDOBOT_SUPERVISAO_HUMANA.md](frontend/ENDOBOT_SUPERVISAO_HUMANA.md) — regras documentadas para supervisão e controles de acesso.
-- [backend/README_RAG.md](backend/README_RAG.md) — acervo de referência e recuperação de contexto do EndoBot.
-- [backend/local-voice/README.md](backend/local-voice/README.md) — síntese e reconhecimento de voz locais.
+- [README do projeto](README.md) — instalação e uso local.
+- [Histórico de mudanças](frontend/CHANGELOG.md) — etapas e recursos adicionados ao site.
+- [Configuração de autenticação](frontend/CONFIGURAR_AUTENTICACAO.md) — contas e acesso.
+- [Supervisão humana do EndoBot](frontend/ENDOBOT_SUPERVISAO_HUMANA.md) — funcionamento da equipe humana e controles de acesso.
+- [Acervo de referência do EndoBot](backend/README_RAG.md) — informações usadas para responder às perguntas.
+- [Voz local](backend/local-voice/README.md) — fala e reconhecimento de voz.
