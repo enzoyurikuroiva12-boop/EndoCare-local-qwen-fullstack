@@ -55,15 +55,17 @@ export async function synthesizeLocalSpeech(text: string, preferredLanguage = "p
       body: JSON.stringify({ input, language: preferredLanguage.slice(0, 12) || "pt" }),
       signal: AbortSignal.timeout(voiceTimeoutMs()),
     });
-    if (!response.ok) throw await serviceError(response, "O OmniVoice está carregando ou está indisponível. Inicie o serviço de voz local.");
+    if (!response.ok) throw await serviceError(response, "A voz local está carregando ou está indisponível. Inicie o serviço de voz.");
     const bytes = Buffer.from(await response.arrayBuffer());
     if (bytes.length < 44 || bytes.length > MAX_WAV_BYTES || bytes.toString("ascii", 0, 4) !== "RIFF" || bytes.toString("ascii", 8, 12) !== "WAVE") {
-      throw new LocalVoiceError("O OmniVoice não devolveu um áudio WAV válido.");
+      throw new LocalVoiceError("O serviço de voz não devolveu um áudio WAV válido.");
     }
-    return { audioBase64: bytes.toString("base64"), audioMimeType: "audio/wav", provider: "omnivoice", voice: "female" };
+    const provider = response.headers.get("x-endocare-tts-provider") || "omnivoice";
+    const voice = provider === "windows-sapi-pt-BR" ? "female-pt-BR" : "female";
+    return { audioBase64: bytes.toString("base64"), audioMimeType: "audio/wav", provider, voice };
   } catch (error) {
     if (error instanceof LocalVoiceError) throw error;
-    throw new LocalVoiceError("Não foi possível preparar a voz. Verifique se o OmniVoice local está iniciado.");
+    throw new LocalVoiceError("Não foi possível preparar a voz. Verifique se o serviço de voz local está iniciado.");
   }
 }
 

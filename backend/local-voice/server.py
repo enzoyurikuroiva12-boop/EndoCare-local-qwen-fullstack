@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import argparse
 import asyncio
+import base64
 from contextlib import asynccontextmanager
 import gc
 import io
@@ -10,6 +11,9 @@ import logging
 import os
 from pathlib import Path
 import re
+import shutil
+import subprocess
+import tempfile
 import threading
 import time
 
@@ -24,7 +28,6 @@ from fastapi import FastAPI, File, HTTPException, Request, UploadFile
 from fastapi.responses import JSONResponse, Response
 from huggingface_hub import snapshot_download
 from pydantic import BaseModel, Field
-import torch
 
 HERE = Path(__file__).resolve().parent
 MODEL_CACHE = HERE / "models"
@@ -37,13 +40,67 @@ MAX_AUDIO_SECONDS = 65
 MAX_CPU_TEXT_CHARS = 300
 CPU_TEXT_LIMIT_MESSAGE = "A voz na CPU aceita até 300 caracteres. Peça uma resposta mais curta para ouvir."
 VOICE_ATTRIBUTES = "female, middle-aged, moderate pitch"
+WINDOWS_SAPI_SCRIPT = HERE / "synthesize-windows-sapi.ps1"
 logger = logging.getLogger("endobot.voice")
 logging.getLogger("httpx").setLevel(logging.WARNING)
 state = {"status": "loading", "tts": "loading", "asr": "loading", "device": None}
 tts_model = None
 asr_model = None
+torch = None
 generation_lock = threading.Lock()
 transcription_lock = threading.Lock()
+sapi_voice_name = None
+
+
+def find_windows_ptbr_voice():
+    if os.name != "nt" or not WINDOWS_SAPI_SCRIPT.is_file():
+        return None
+    powershell = shutil.which("powershell.exe")
+    if not powershell:
+        return None
+    try:
+        result = subprocess.run(
+            [powershell, "-NoProfile", "-NonInteractive", "-ExecutionPolicy", "Bypass",
+             "-File", str(WINDOWS_SAPI_SCRIPT), "-ListPtBrFemaleVoices"],
+            capture_output=True, text=True, timeout=15,
+            creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0),
+            check=False,
+        )
+        if result.returncode == 0:
+            return result.stdout.strip() or None
+        logger.warning("Windows pt-BR voice discovery failed (exit %s)", result.returncode)
+    except Exception as error:
+        logger.warning("Windows pt-BR voice discovery failed (%s)", type(error).__name__)
+    return None
+
+
+def synthesize_windows_ptbr(text: str):
+    powershell = shutil.which("powershell.exe")
+    if not powershell or not sapi_voice_name:
+        raise RuntimeError("Windows voice is unavailable")
+    handle, output_path = tempfile.mkstemp(prefix="endocare-tts-", suffix=".wav")
+    os.close(handle)
+    environment = os.environ.copy()
+    environment["ENDOCARE_SAPI_VOICE"] = sapi_voice_name
+    environment["ENDOCARE_TTS_OUTPUT"] = output_path
+    encoded_text = base64.b64encode(text.encode("utf-8")).decode("ascii")
+    try:
+        result = subprocess.run(
+            [powershell, "-NoProfile", "-NonInteractive", "-ExecutionPolicy", "Bypass",
+             "-File", str(WINDOWS_SAPI_SCRIPT)],
+            input=encoded_text, capture_output=True, text=True, timeout=90,
+            env=environment, creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0),
+            check=False,
+        )
+        if result.returncode != 0:
+            logger.error("Windows pt-BR speech synthesis failed (exit %s)", result.returncode)
+            raise RuntimeError("Windows Portuguese speech synthesis failed")
+        audio = Path(output_path).read_bytes()
+        if len(audio) < 44 or audio[:4] != b"RIFF" or audio[8:12] != b"WAVE":
+            raise RuntimeError("Windows Portuguese speech synthesis returned an invalid WAV")
+        return audio
+    finally:
+        Path(output_path).unlink(missing_ok=True)
 
 
 def apply_runtime_profile():
@@ -57,30 +114,46 @@ def apply_runtime_profile():
                  maxTextChars=MAX_CPU_TEXT_CHARS if cpu else 6000)
 
 
-def download_models(offline_first=False):
+def download_model(repo, revision, patterns, required, offline_first=False):
     MODEL_CACHE.mkdir(parents=True, exist_ok=True)
-    def fetch_model(repo, revision, patterns, required):
-        if offline_first:
-            try:
-                cached = snapshot_download(repo, revision=revision, cache_dir=str(MODEL_CACHE), local_files_only=True)
-                if all((Path(cached) / filename).is_file() for filename in required):
-                    return cached
-            except Exception:
-                pass
-        return snapshot_download(repo, revision=revision, cache_dir=str(MODEL_CACHE), allow_patterns=patterns)
+    if offline_first:
+        try:
+            cached = snapshot_download(repo, revision=revision, cache_dir=str(MODEL_CACHE), local_files_only=True)
+            if all((Path(cached) / filename).is_file() for filename in required):
+                return cached
+        except Exception:
+            pass
+    return snapshot_download(repo, revision=revision, cache_dir=str(MODEL_CACHE), allow_patterns=patterns)
 
-    omni_path = fetch_model(OMNI_MODEL, OMNI_REVISION,
+
+def download_models(offline_first=False):
+    omni_path = download_model(OMNI_MODEL, OMNI_REVISION,
         ["*.json", "*.jinja", "*.safetensors", "audio_tokenizer/*"],
-        ["model.safetensors", "config.json", "tokenizer.json", "audio_tokenizer/model.safetensors"])
-    whisper_path = fetch_model(WHISPER_MODEL, WHISPER_REVISION,
-        ["*.json", "*.bin", "*.txt"], ["model.bin", "config.json", "tokenizer.json"])
+        ["model.safetensors", "config.json", "tokenizer.json", "audio_tokenizer/model.safetensors"], offline_first)
+    whisper_path = download_model(WHISPER_MODEL, WHISPER_REVISION,
+        ["*.json", "*.bin", "*.txt"], ["model.bin", "config.json", "tokenizer.json"], offline_first)
     return omni_path, whisper_path
 
 
 def load_models():
-    global tts_model, asr_model
+    global tts_model, asr_model, sapi_voice_name, torch
     try:
+        sapi_voice_name = find_windows_ptbr_voice()
+        if sapi_voice_name:
+            logger.info("Brazilian Portuguese speech uses Windows voice %s", sapi_voice_name)
         from faster_whisper import WhisperModel
+        if sapi_voice_name:
+            # Portuguese TTS is handled by Windows. Avoid loading the large
+            # English-focused model just to synthesize text in pt-BR.
+            state.update(tts="ready", ttsEngine="windows-sapi-pt-BR", device="windows")
+            whisper_path = download_model(WHISPER_MODEL, WHISPER_REVISION,
+                ["*.json", "*.bin", "*.txt"], ["model.bin", "config.json", "tokenizer.json"], offline_first=True)
+            asr_model = WhisperModel(whisper_path, device="cpu", compute_type="int8", cpu_threads=4)
+            state.update(status="ready", asr="ready")
+            logger.info("Windows Brazilian Portuguese speech and local Whisper are ready")
+            return
+
+        import torch
         from omnivoice import OmniVoice
         omni_path, whisper_path = download_models(offline_first=True)
         asr_model = WhisperModel(whisper_path, device="cpu", compute_type="int8", cpu_threads=4)
@@ -136,7 +209,7 @@ def load_models():
         apply_runtime_profile()
         logger.info("OmniVoice and local Whisper are ready")
     except Exception as error:
-        state.update(status="error", tts="error")
+        state.update(status="error", tts="ready" if sapi_voice_name else "error")
         # Do not log submitted speech, text, environment secrets or cloud keys.
         logger.exception("Local voice model loading failed (%s)", type(error).__name__)
 
@@ -182,9 +255,28 @@ def normalize_text(text: str):
 
 
 def generate_speech(text: str, language: str = "pt"):
+    use_windows_ptbr = language.split("-")[0].lower() == "pt" and sapi_voice_name is not None
+    if sapi_voice_name and not use_windows_ptbr:
+        raise HTTPException(400, "Esta instalação está configurada para falar português do Brasil.")
+    if use_windows_ptbr:
+        if state["tts"] != "ready":
+            raise HTTPException(503, "A voz local ainda está carregando ou não pôde iniciar.")
+        if len(text) > 6000:
+            raise HTTPException(413, CPU_TEXT_LIMIT_MESSAGE)
+        if not generation_lock.acquire(blocking=False):
+            raise HTTPException(429, "Uma fala já está sendo preparada. Aguarde.")
+        try:
+            spoken = normalize_text(text)
+            if not spoken:
+                raise HTTPException(400, "Informe uma resposta com texto para ouvir.")
+            return synthesize_windows_ptbr(spoken)
+        finally:
+            generation_lock.release()
+
     if state["tts"] != "ready" or tts_model is None:
-        raise HTTPException(503, "OmniVoice ainda está carregando ou não pôde iniciar.")
-    if len(text) > int(state.get("maxTextChars", 6000)):
+        raise HTTPException(503, "A voz local ainda está carregando ou não pôde iniciar.")
+    max_chars = int(state.get("maxTextChars", 6000))
+    if len(text) > max_chars:
         raise HTTPException(413, CPU_TEXT_LIMIT_MESSAGE)
     if not generation_lock.acquire(blocking=False):
         raise HTTPException(429, "Uma fala já está sendo preparada. Aguarde.")
@@ -230,7 +322,7 @@ def generate_speech(text: str, language: str = "pt"):
         raise HTTPException(503, "Memória da GPU insuficiente para preparar a voz.") from error
     finally:
         try:
-            if torch.cuda.is_initialized():
+            if torch is not None and torch.cuda.is_initialized():
                 # Also release cached CUDA allocations after a CPU fallback,
                 # so Qwen can immediately use the shared GPU.
                 torch.cuda.empty_cache()
@@ -240,20 +332,27 @@ def generate_speech(text: str, language: str = "pt"):
 
 @app.get("/health")
 def health():
-    return {**state, "service": "endobot-local-voice", "provider": "omnivoice", "model": OMNI_MODEL,
-            "voice": VOICE_ATTRIBUTES, "asrModel": WHISPER_MODEL, "asrDevice": "cpu", "port": 7862}
+    return {**state, "service": "endobot-local-voice",
+            "provider": "windows-sapi-pt-BR" if sapi_voice_name else "omnivoice",
+            "model": None if sapi_voice_name else OMNI_MODEL,
+            "voice": sapi_voice_name or VOICE_ATTRIBUTES,
+            "ttsEngine": "windows-sapi-pt-BR" if sapi_voice_name else "omnivoice",
+            "asrModel": WHISPER_MODEL, "asrDevice": "cpu", "port": 7862}
 
 
 @app.post("/v1/audio/speech")
 async def speech(payload: SpeechRequest):
     try:
         audio = await asyncio.to_thread(generate_speech, payload.input, payload.language)
-        return Response(audio, media_type="audio/wav", headers={"Cache-Control": "no-store"})
+        provider = "windows-sapi-pt-BR" if payload.language.split("-")[0].lower() == "pt" and sapi_voice_name else "omnivoice"
+        return Response(audio, media_type="audio/wav", headers={
+            "Cache-Control": "no-store", "X-EndoCare-TTS-Provider": provider,
+        })
     except HTTPException:
         raise
     except Exception as error:
-        logger.error("OmniVoice synthesis failed (%s)", type(error).__name__)
-        raise HTTPException(503, "Não foi possível preparar a voz do OmniVoice.") from error
+        logger.error("Local speech synthesis failed (%s)", type(error).__name__)
+        raise HTTPException(503, "Não foi possível preparar a voz local.") from error
 
 
 def transcribe_audio(audio: bytes):

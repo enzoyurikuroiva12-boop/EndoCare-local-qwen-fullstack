@@ -114,7 +114,7 @@ export default async function handler(request: VercelRequest, response: VercelRe
       const speech = await synthesizeLocalSpeech(answer, typeof body.preferredLanguage === "string" ? body.preferredLanguage : "pt");
       return response.status(200).json({ answer, transcript: question, redacted: Boolean(chatPayload.redacted), securityAction: chatPayload.securityAction, ...speech });
     } catch (error) {
-      const audioError = error instanceof LocalVoiceError ? error.message : "Não foi possível preparar o áudio do OmniVoice.";
+      const audioError = error instanceof LocalVoiceError ? error.message : "Não foi possível preparar o áudio da voz local.";
       return response.status(200).json({ answer, transcript: question, redacted: Boolean(chatPayload.redacted), securityAction: chatPayload.securityAction, audioBase64: null, audioMimeType: "audio/wav", audioError });
     }
   } catch (error) {

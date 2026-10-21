@@ -62,7 +62,7 @@ describe("EndoBot recorded voice", () => {
     expect(fetchMock.mock.calls[1][1].headers.Authorization).toBe("Bearer test-local-token");
   });
 
-  it("keeps a valid chat response and reports the OmniVoice audio failure", async () => {
+  it("keeps a valid chat response and reports the local audio failure", async () => {
     vi.stubEnv("ENDOBOT_ASR_PROVIDER", "local");
     vi.stubEnv("ENDOBOT_PUBLIC_URL", "http://127.0.0.1:3000");
     vi.stubEnv("OMNIVOICE_BASE_URL", "http://127.0.0.1:7862");
@@ -76,6 +76,6 @@ describe("EndoBot recorded voice", () => {
     expect(res.code).toBe(200);
     expect(res.payload.answer).toBe("Olá, como posso ajudar?");
     expect(res.payload.audioBase64).toBeNull();
-    expect(res.payload.audioError).toMatch(/OmniVoice/);
+    expect(res.payload.audioError).toMatch(/voz local/);
   });
 });

@@ -35,15 +35,16 @@ describe("EndoBot local voice", () => {
     expect(fetchMock.mock.calls.every(([url]) => url === "http://127.0.0.1:7862/health")).toBe(true);
   });
 
-  it("returns real WAV bytes from OmniVoice without a cloud key", async () => {
+  it("returns real WAV bytes from the local Portuguese voice without a cloud key", async () => {
     vi.stubEnv("OPENAI_API_KEY", "");
     vi.stubEnv("OPENAI_API_KEY_FALLBACK", "");
     vi.stubEnv("OMNIVOICE_BASE_URL", "http://127.0.0.1:7862");
-    const fetchMock = vi.fn().mockResolvedValue(new Response(wav()));
+    const fetchMock = vi.fn().mockResolvedValue(new Response(wav(), { headers: { "X-EndoCare-TTS-Provider": "windows-sapi-pt-BR" } }));
     vi.stubGlobal("fetch", fetchMock);
     const result = await synthesizeLocalSpeech("Olá, estou aqui para ajudar.", "pt-BR");
     expect(result.audioMimeType).toBe("audio/wav");
-    expect(result.provider).toBe("omnivoice");
+    expect(result.provider).toBe("windows-sapi-pt-BR");
+    expect(result.voice).toBe("female-pt-BR");
     expect(Buffer.from(result.audioBase64, "base64").equals(wav())).toBe(true);
     expect(fetchMock).toHaveBeenCalledWith("http://127.0.0.1:7862/v1/audio/speech", expect.objectContaining({
       body: JSON.stringify({ input: "Olá, estou aqui para ajudar.", language: "pt-BR" }),
