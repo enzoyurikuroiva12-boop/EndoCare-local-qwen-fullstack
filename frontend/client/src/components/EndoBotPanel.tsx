@@ -290,7 +290,7 @@ export function EndoBotPanel() {
   const textRequestRef = useRef<AbortController | null>(null);
   const recordingSessionRef = useRef(0);
   const recordingTimerRef = useRef<number | null>(null);
-  const voiceAudioCacheRef = useRef<{ text: string; language: BotLanguage; audioBase64: string; audioMimeType: string } | null>(null);
+  const voiceAudioCacheRef = useRef<{ text: string; language: BotLanguage; provider: string; audioBase64: string; audioMimeType: string } | null>(null);
   const t = endoBotCopy[language];
   const categoryLabel = (value: string) => t.categories[value as Category] ?? value;
   const activeConversation = useMemo(() => conversations.find((conversation) => conversation.id === activeConversationId) ?? null, [activeConversationId, conversations]);
@@ -740,15 +740,17 @@ export function EndoBotPanel() {
     voiceRequestRef.current = controller;
     try {
       const cached = voiceAudioCacheRef.current;
-      let result: { audioBase64: string; audioMimeType: string };
-      if (cached?.text === text && cached.language === language) result = cached;
+      const expectedProvider = language === "pt" ? "windows-sapi-pt-BR" : "omnivoice";
+      let result: { audioBase64: string; audioMimeType: string; provider: string };
+      if (cached?.text === text && cached.language === language && cached.provider === expectedProvider) result = cached;
       else {
         const sessionResult = await supabase.auth.getSession();
         throwIfEndoBotCancelled(controller.signal);
         const headers = createEndoBotRequestHeaders({ authenticated: isAuthenticated, accessToken: sessionResult.data.session?.access_token, sessionError: sessionResult.error, sessionExpiredMessage: t.sessionExpired });
-        result = await requestEndoBot<{ audioBase64: string; audioMimeType: string }>(`${apiBase}/api/endobot-tts`, { method: "POST", headers, body: JSON.stringify({ text, preferredLanguage: language }), signal: controller.signal }, 180_000);
+        const generated = await requestEndoBot<{ audioBase64: string; audioMimeType: string; provider?: string }>(`${apiBase}/api/endobot-tts`, { method: "POST", headers, body: JSON.stringify({ text, preferredLanguage: language }), signal: controller.signal }, 180_000);
         throwIfEndoBotCancelled(controller.signal);
-        if (!result.audioBase64) throw new EndoBotApiError(t.voiceUnavailable);
+        if (!generated.audioBase64) throw new EndoBotApiError(t.voiceUnavailable);
+        result = { ...generated, provider: generated.provider || "unknown" };
         voiceAudioCacheRef.current = { text, language, ...result };
       }
       if (controller.signal.aborted) return;
