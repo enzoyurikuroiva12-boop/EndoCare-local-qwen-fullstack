@@ -12,6 +12,9 @@ $taskInspectorPort = 4040
 $taskNgrok = Get-Command ngrok.exe -ErrorAction SilentlyContinue
 $taskNode = Get-Command node.exe -ErrorAction SilentlyContinue
 $taskPowerShell = Get-Command powershell.exe -ErrorAction Stop
+$taskNgrokDomain = [Environment]::GetEnvironmentVariable('ENDOCARE_NGROK_DOMAIN', 'Process')
+if ([string]::IsNullOrWhiteSpace($taskNgrokDomain)) { $taskNgrokDomain = 'endocare.ngrok.app' }
+$taskNgrokUrl = "https://$taskNgrokDomain"
 $taskGuardProcess = $null
 $taskNgrokProcess = $null
 $taskPreviousUser = [Environment]::GetEnvironmentVariable('ENDOCARE_NGROK_USER', 'Process')
@@ -21,6 +24,9 @@ $taskPreviousCookie = [Environment]::GetEnvironmentVariable('ENDOCARE_NGROK_COOK
 try {
     if (-not $taskNgrok) { throw 'Ngrok nao encontrado. Instale o agente e configure o authtoken da sua conta.' }
     if (-not $taskNode) { throw 'Node.js nao encontrado.' }
+    if ($taskNgrokDomain -notmatch '^(?=.{1,253}$)(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,63}$') {
+        throw 'ENDOCARE_NGROK_DOMAIN deve conter apenas o dominio reservado, sem https:// ou caminho.'
+    }
     if (-not (Test-Path -LiteralPath $taskFrontendServer)) { throw 'Instale as dependencias do frontend antes de iniciar o tunel.' }
     if (-not (Test-Path -LiteralPath $taskGuardPath)) { throw 'O encaminhador protegido do Ngrok nao foi encontrado.' }
     if (-not (Test-Path -LiteralPath (Join-Path $taskRoot 'scripts\check-ngrok-guard.mjs'))) { throw 'O teste de seguranca do Ngrok nao foi encontrado.' }
@@ -88,10 +94,10 @@ try {
     Write-Host 'Acesso remoto protegido por autenticacao local.' -ForegroundColor Green
     Write-Host 'Usuario: EndoCare'
     Write-Host "Senha temporaria: $taskPassword" -ForegroundColor Yellow
-    Write-Host 'Obtendo URL HTTPS do Ngrok...'
+    Write-Host "Solicitando dominio fixo: $taskNgrokUrl"
 
     $taskNgrokProcess = Start-Process -FilePath $taskNgrok.Source `
-        -ArgumentList "http $taskGuardPort" `
+        -ArgumentList @('http', [string]$taskGuardPort, '--url', $taskNgrokUrl) `
         -WorkingDirectory $taskRoot `
         -WindowStyle Hidden `
         -PassThru `
@@ -122,7 +128,7 @@ try {
         }
         try {
             $taskTunnels = Invoke-RestMethod -Uri "http://127.0.0.1:$taskInspectorPort/api/tunnels" -TimeoutSec 2
-            $taskTunnel = $taskTunnels.tunnels | Where-Object { $_.proto -eq 'https' -and $_.config.addr -match ':5174$' } | Select-Object -First 1
+            $taskTunnel = $taskTunnels.tunnels | Where-Object { $_.proto -eq 'https' -and $_.public_url -eq $taskNgrokUrl -and $_.config.addr -match ':5174$' } | Select-Object -First 1
             if ($taskTunnel) { $taskTunnelUrl = $taskTunnel.public_url }
         } catch { }
         if (-not $taskTunnelUrl) { Start-Sleep -Seconds 1 }

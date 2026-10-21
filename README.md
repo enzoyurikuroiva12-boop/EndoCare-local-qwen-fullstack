@@ -38,8 +38,11 @@ O chat de texto pode funcionar sem OmniVoice. O EndoCare inicia a voz automatica
 ## Acesso por outro computador com Ngrok
 
 1. Instale Ngrok para Windows e configure seu token uma vez no terminal com `ngrok config add-authtoken SEU_TOKEN`. O token fica na configuração local do Ngrok; não o coloque no GitHub.
-2. Execute `INICIAR_ENDOCARE.bat` e selecione `2`. O EndoCare inicia os serviços locais e abre um túnel HTTPS para o frontend, encaminhando a API ao backend local.
-3. No outro computador, abra o endereço HTTPS e use o usuário `EndoCare` e a senha temporária exibidos no terminal.
+2. Na conta Ngrok, reserve o domínio `endocare.ngrok.app` em **Domains**. O plano da conta precisa permitir escolher esse domínio Ngrok; contas que só têm um domínio de desenvolvimento atribuído não podem escolher esse nome. O CLI exige que o domínio já esteja reservado para a conta.
+3. Execute `INICIAR_ENDOCARE.bat` e selecione `2`. O EndoCare inicia os serviços locais e abre o túnel HTTPS em `https://endocare.ngrok.app`, encaminhando a API ao backend local.
+4. No outro computador, abra o endereço HTTPS e use o usuário `EndoCare` e a senha temporária exibidos no terminal.
+
+Se seu domínio reservado tiver outro nome, defina `ENDOCARE_NGROK_DOMAIN` no ambiente do Windows com o host reservado (sem `https://`); o padrão do iniciador é `endocare.ngrok.app`.
 
 No primeiro acesso, o Ngrok pode mostrar uma tela informativa; confirme que deseja continuar e informe as credenciais do EndoCare. Mantenha a janela aberta enquanto usar o acesso remoto. `Ctrl+C` encerra o túnel; execute também `ENCERRAR_ENDOCARE.bat` para parar os serviços locais. Uma nova execução gera outra senha temporária. Compartilhe o endereço e a senha apenas com quem deve acessar o ambiente. [Sobre o aviso do Ngrok](https://ngrok.com/abuse#browser-warning).
 
